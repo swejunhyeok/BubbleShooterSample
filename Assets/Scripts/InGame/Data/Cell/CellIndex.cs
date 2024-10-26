@@ -8,6 +8,7 @@ namespace JH
     {
         public enum CellDirectionType
         {
+            None = 0,
             RightUp,
             Right,
             RightDown,
@@ -18,6 +19,8 @@ namespace JH
 
         public static class CellIndex
         {
+            public static Vector2Int None = new Vector2Int(int.MinValue, int.MinValue);
+
             public static class OddLine
             {
                 public static Vector2Int RightUpDirection = new Vector2Int(1, 1);

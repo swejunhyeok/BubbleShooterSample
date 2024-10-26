@@ -30,9 +30,9 @@ namespace JH
             BombCircle,
             BigBombCircle,
 
-            RedFlyCircle = 101,
-            YellowFlyCircle,
-            BlueFlyCircle,
+            RedFairyCircle = 101,
+            YellowFairyCircle,
+            BlueFairyCircle,
         }
 
         [System.Flags]
@@ -62,6 +62,7 @@ namespace JH
             ChangeBlock,
             Bomb,
             LargeBomb,
+            Fairy,
         }
 
         [CreateAssetMenu(fileName = "Block Attribute", menuName = "JH/Bubble Shooter Sample/Block Attribute")]

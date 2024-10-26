@@ -9,27 +9,33 @@ namespace JH
 
         #region In Game
 
-        private static float heightDepth = -1f;
+        private static float heightInterval = -1f;
         /// <summary>
         /// Circle object radius = 0.5f
         /// <br/>
-        /// Circle object height depth = √(3 * (Circle object radius ^ 2))
+        /// Circle object height interval = √(3 * (Circle object radius ^ 2))
         /// </summary>
-        public static float HEIGHT_DEPTH
+        public static float HEIGHT_INTERVAL
         {
             get
             {
-                if(heightDepth == -1)
+                if(heightInterval == -1)
                 {
-                    heightDepth = Mathf.Sqrt(3 * heightDepth * heightDepth);
+                    heightInterval = Mathf.Round(Mathf.Sqrt(3 * heightInterval * heightInterval) * 1000) * 0.001f;
                 }
-                return heightDepth;
+                return heightInterval;
             }
         }
 
         public static float CIRCLE_RADIUS = 0.5f;
 
         public static int MAX_WIDTH_NUM = 10;
+
+        public static int MAX_VISIBLE_HEIGHT_NUM = 11;
+
+        public static float DEFAULT_CAMERA_ORTHOGRAPHIC_SIZE = 9.95f;
+
+        public static float Degree_LIMIT = 30f;
 
         #endregion
 
