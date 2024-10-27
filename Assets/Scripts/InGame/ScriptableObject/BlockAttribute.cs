@@ -16,7 +16,6 @@ namespace JH
             Top = 0x01000,
         }
 
-        [System.Flags]
         public enum BlockType
         {
             None = 0,
@@ -30,7 +29,7 @@ namespace JH
             BombCircle,
             BigBombCircle,
 
-            RedFairyCircle = 101,
+            RedFairyCircle = 111,
             YellowFairyCircle,
             BlueFairyCircle,
         }
@@ -47,22 +46,22 @@ namespace JH
         [System.Flags]
         public enum HitConditionType
         {
-            None,
-            ColorMatch,
-            ArroundMatch,
-            SpecialBlock,
-            GetShot,
+            None = 0x000,
+            ColorMatch = 0x001,
+            ArroundMatch = 0x002,
+            SpecialBlock = 0x004,
+            GetShot = 0x008,
         }
 
         [System.Flags]
         public enum HitEffectType
         {
-            None,
-            Destroy,
-            ChangeBlock,
-            Bomb,
-            LargeBomb,
-            Fairy,
+            None = 0x000,
+            Destroy = 0x001,
+            ChangeBlock = 0x002,
+            Bomb = 0x004,
+            LargeBomb = 0x008,
+            Fairy = 0x010,
         }
 
         [CreateAssetMenu(fileName = "Block Attribute", menuName = "JH/Bubble Shooter Sample/Block Attribute")]
@@ -71,6 +70,7 @@ namespace JH
 
             #region Common
 
+            [Header("Common")]
             [SerializeField]
             private BlockType _type;
             public BlockType Type
@@ -91,6 +91,9 @@ namespace JH
             {
                 get { return _layer; }
             }
+            public bool IsBottomLayer => (_layer & LayerType.Bottom) == LayerType.Bottom;
+            public bool IsMiddleLayer => (_layer & LayerType.Middle) == LayerType.Middle;
+            public bool IsTopLayer => (_layer & LayerType.Top) == LayerType.Top;
 
             [SerializeField]
             private ColorType _color;
@@ -99,10 +102,18 @@ namespace JH
                 get { return _color; }
             }
 
+            [SerializeField]
+            private Sprite _sprBlock;
+            public Sprite SprBlock
+            {
+                get { return _sprBlock; }
+            }
+
             #endregion
 
             #region Hit
 
+            [Header("Hit")]
             [SerializeField]
             private HitConditionType _hitCondition;
             public HitConditionType HitCondition
