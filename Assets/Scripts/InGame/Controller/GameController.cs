@@ -128,7 +128,7 @@ namespace JH
             private void LoadLevelData(int level)
             {
                 TextAsset levelFile = Resources.Load<TextAsset>($"LevelData/{level}");
-                if(levelFile == null)
+                if (levelFile == null)
                 {
                     return;
                 }
@@ -141,7 +141,7 @@ namespace JH
                 if (root.ContainsKey(ConstantData.LEVEL_DATA_STAR_SCORES))
                 {
                     LitJson.JsonData starScores = root[ConstantData.LEVEL_DATA_STAR_SCORES];
-                    for(int i = 0; i < starScores.Count; ++i)
+                    for (int i = 0; i < starScores.Count; ++i)
                     {
                         if (int.TryParse(starScores[i].ToString(), out int score))
                         {
@@ -151,7 +151,7 @@ namespace JH
                 }
 
                 // mission load
-                if(root.ContainsKey(ConstantData.LEVEL_DATA_MISSION))
+                if (root.ContainsKey(ConstantData.LEVEL_DATA_MISSION))
                 {
                     // TODO
                 }
@@ -166,11 +166,18 @@ namespace JH
 
                 RemoveGameState(GameState.GameStart);
                 bool isNeed = Map.IsNeedGenerateBlock();
-                if(isNeed)
+                if (isNeed)
                 {
-                    Map.RequsetGenerate();
                     AddGameState(GameState.GameEffect);
+                    StartCoroutine(CheckGenerateBlock());
                 }
+            }
+
+            private IEnumerator CheckGenerateBlock()
+            {
+                yield return new WaitForSeconds(1);
+
+                Map.RequsetGenerate();
             }
 
             #endregion
@@ -185,10 +192,11 @@ namespace JH
 
             IEnumerator GameStart()
             {
-                yield return null;
-
-                Application.targetFrameRate = 120;
+                Application.targetFrameRate = 60;
                 Input.multiTouchEnabled = false;
+
+                yield return new WaitForSeconds(1);
+
 
                 LoadLevelData(10);
             }
@@ -197,89 +205,231 @@ namespace JH
 
             #region Touch
 
-            private Vector2Int _targetCellPos = CellIndex.None;
-            private Vector2 _touchDownPoisition;
+            [Header("Touch")]
+            [SerializeField]
+            private List<HintLine> _hintLines = new List<HintLine>();
+
+
+            private Cell _previouseCell;
 
             private void InputTouch(Vector2 touchPosition, TouchPhase type)
             {
-                Vector2Int cellPosition = Vector2Int.zero;
-                if (cellPosition == CellIndex.None)
-                {
-                    _targetCellPos = CellIndex.None;
-                    return;
-                }
-
                 if (IsContainState(GameState.Processing_UserInput) ||
                     IsContainState(GameState.GameEffect) ||
                     IsContainState(GameState.GameStart) ||
                     IsContainState(GameState.Done_GameEnd))
                 {
-                    _targetCellPos = CellIndex.None;
+                    TouchCancle();
                     return;
                 }
 
                 switch (type)
                 {
                     case TouchPhase.Began:
+                    case TouchPhase.Moved:
                     {
-                        OnTouchDown(cellPosition, touchPosition);
+                        OnTouchDrag(touchPosition);
                         break;
                     }
                     case TouchPhase.Ended:
+                    {
+                        OnTouchUp(touchPosition);
+                        break;
+                    }
                     case TouchPhase.Canceled:
                     {
-                        OnTouchUp(cellPosition, touchPosition);
+                        TouchCancle();
                         break;
                     }
-                    case TouchPhase.Moved:
+                }
+            }
+
+            private void TouchCancle()
+            {
+                if (_previouseCell != null)
+                {
+                    _previouseCell.SetHintEnable(false);
+                    _previouseCell = null;
+                }
+                for(int i = 0; i < _hintLines.Count; i++)
+                {
+                    _hintLines[i].OffHint();
+                }
+            }
+
+            public void OnTouchUp(Vector2 touchPosition)
+            {
+                if(_previouseCell == null)
+                {
+                    Debug.Log("Call");
+                    return;
+                }
+                TouchCancle();
+            }
+
+            private struct HintLineInfo
+            {
+                public float Degree;
+                public Vector3 Pivot;
+                public Vector3 Target;
+            }
+            public void OnTouchDrag(Vector2 touchPosition)
+            {
+                TouchCancle();
+                Vector2 sponerPosition = UIController.Instance.PosMainSponer;
+                Vector2 targetPosition = touchPosition - sponerPosition;
+                float fDegree = Mathf.Atan2(targetPosition.y, targetPosition.x) * Mathf.Rad2Deg;
+                int degree = Mathf.RoundToInt(fDegree * 100f);
+                if (fDegree < ConstantData.Degree_LIMIT || fDegree > 180 - ConstantData.Degree_LIMIT)
+                {
+                    TouchCancle();
+                    return;
+                }
+                List<int> detectedIndex = new List<int>();
+                if (Map.IsStartOdd)
+                {
+                    detectedIndex = GameManager.Instance.OddDetect[degree];
+                }
+                else
+                {
+                    detectedIndex = GameManager.Instance.EvenDetect[degree];
+                }
+
+                int previouseY = -1;
+                List<Cell> previouseEmptyCellList = new List<Cell>();
+                List<Cell> emptyCellList = new List<Cell>();
+                for (int i = 0; i < detectedIndex.Count; ++i)
+                {
+                    Cell cell = Map.GetCell(detectedIndex[i]);
+                    if (cell.Type == CellType.None)
                     {
-                        OnTouchDrag(cellPosition, touchPosition);
+                        previouseEmptyCellList = new List<Cell>(emptyCellList);
+                        break;
+                    }
+                    if (cell.Block.IsEmpty)
+                    {
+                        int y = detectedIndex[i] / ConstantData.MAX_WIDTH_NUM;
+                        if (y != previouseY)
+                        {
+                            previouseY = y;
+                            previouseEmptyCellList = new List<Cell>(emptyCellList);
+                            emptyCellList.Clear();
+                        }
+                        emptyCellList.Add(cell);
+                    }
+                    else
+                    {
+                        previouseEmptyCellList = new List<Cell>(emptyCellList);
                         break;
                     }
                 }
-            }
-
-            public void OnTouchDown(Vector2Int cellPosition, Vector2 touchPosition)
-            {
-                _targetCellPos = cellPosition;
-                _touchDownPoisition = touchPosition;
-            }
-
-            public void OnTouchUp(Vector2Int cellPosition, Vector2 touchPosition)
-            {
-                if (_targetCellPos == CellIndex.None)
+                Cell targetCell = null;
+                if (previouseEmptyCellList.Count != 0 && degree != 9000)
                 {
-                    return;
+                    List<HintLineInfo> hintLineInfos = new List<HintLineInfo>();
+                    List<LineEquationInfo> lineEquationInfos = new List<LineEquationInfo>();
+                    float delta = sponerPosition.y;
+                    float targetDegree = fDegree;
+                    Vector2 targetPos = sponerPosition;
+                    float minDistance = float.MaxValue;
+                    Vector2 previousPos = targetPos;
+                    float previousDegree = targetDegree;
+                    while (delta <= previouseEmptyCellList[0].transform.position.y)
+                    {
+                        previousPos = targetPos;
+                        previousDegree = targetDegree;
+                        float gradient = InGameUtils.ComputeGradient(targetDegree);
+                        LineEquationInfo lineEquationInfo = new LineEquationInfo()
+                        {
+                            Gradient = gradient,
+                            Delta = InGameUtils.ComputeDelta(gradient, targetPos),
+                            IsPositiveDirection = targetDegree < 90
+                        };
+                        lineEquationInfos.Add(lineEquationInfo);
+
+                        if (targetDegree > 90)
+                        {
+                            targetDegree = 180 - targetDegree;
+                            delta = InGameUtils.ComputeLineEquation(lineEquationInfo, -5);
+                            targetPos = new Vector2(-5, delta);
+                        }
+                        else
+                        {
+                            targetDegree = targetDegree + 90;
+                            delta = InGameUtils.ComputeLineEquation(lineEquationInfo, 5);
+                            targetPos = new Vector2(5, delta);
+                        }
+                        if(delta <= previouseEmptyCellList[0].transform.position.y)
+                        {
+                            hintLineInfos.Add(new HintLineInfo()
+                            {
+                                Pivot = previousPos,
+                                Target = targetPos,
+                                Degree = previousDegree,
+                            });
+                        }
+                    }
+                    for (int i = 0; i < lineEquationInfos.Count; ++i)
+                    {
+                        LineEquationInfo lineEquationInfo = lineEquationInfos[i];
+                        for (int j = 0; j < previouseEmptyCellList.Count; ++j)
+                        {
+                            float distance = InGameUtils.ComputeDistance(lineEquationInfo, previouseEmptyCellList[j].transform.position);
+                            if (distance <= ConstantData.CIRCLE_RADIUS * 2)
+                            {
+                                if(distance < minDistance)
+                                {
+                                    minDistance = distance;
+                                    targetCell = previouseEmptyCellList[j];
+                                }
+                            }
+                        }
+                    }
+                    if (targetCell != null)
+                    {
+                        hintLineInfos.Add(new HintLineInfo()
+                        {
+                            Pivot = previousPos,
+                            Target = targetCell.transform.position,
+                            Degree = previousDegree,
+                        });
+
+                        float totalDistance = 0;
+                        for (int i = 0; i < hintLineInfos.Count; ++i)
+                        {
+                            bool isLimit = false;
+                            float distance = (hintLineInfos[i].Target - hintLineInfos[i].Pivot).magnitude;
+                            if (totalDistance + distance > ConstantData.HINT_LINE_LIMIT)
+                            {
+                                distance = ConstantData.HINT_LINE_LIMIT - totalDistance;
+                                isLimit = true;
+                            }
+                            else
+                            {
+                                totalDistance += distance;
+                            }
+                            _hintLines[i].SetHint(Color.white, hintLineInfos[i].Pivot, distance, hintLineInfos[i].Degree - 90);
+                            if (isLimit)
+                            {
+                                break;
+                            }
+                        }
+                    }
                 }
-                if (_targetCellPos != cellPosition)
+                else if(previouseEmptyCellList.Count != 0)
                 {
-                    OnTouchDrag(cellPosition, touchPosition);
-                    return;
+                    targetCell = previouseEmptyCellList[0];
+                    _hintLines[0].SetHint(Color.white, sponerPosition, (previouseEmptyCellList[0].transform.position - (Vector3)sponerPosition).magnitude, 0);
                 }
-
-                //OnUsetInput();
-                _targetCellPos = CellIndex.None;
-            }
-
-            public void OnTouchDrag(Vector2Int cellPosition, Vector2 touchPosition)
-            {
-                if (_targetCellPos == CellIndex.None)
+                if (targetCell != null)
                 {
-                    return;
+                    _previouseCell = targetCell;
+                    _previouseCell.SetHintEnable(true);
                 }
-                if (_targetCellPos == cellPosition)
+                else
                 {
-                    return;
+                    TouchCancle();
                 }
-
-                Vector2 diffPosition = touchPosition - _touchDownPoisition;
-                bool isPositiveX = diffPosition.x > 0;
-                bool isPositiveY = diffPosition.y > 0;
-                float absX = isPositiveX ? diffPosition.x : -diffPosition.x;
-                float absY = isPositiveY ? diffPosition.y : -diffPosition.y;
-
-                OnUsetInput();
-                _targetCellPos = CellIndex.None;
             }
 
             public void OnUsetInput()

@@ -59,6 +59,14 @@ namespace JH
                 return _arroundCell[index];
             }
 
+            [SerializeField]
+            private SpriteRenderer _srHint;
+
+            public void SetHintEnable(bool enable)
+            {
+                _srHint.enabled = enable;
+            }
+
             #endregion
 
             #region Cell component

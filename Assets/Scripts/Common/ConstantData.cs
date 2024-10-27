@@ -21,7 +21,7 @@ namespace JH
             {
                 if(heightInterval == -1)
                 {
-                    heightInterval = Mathf.Round(Mathf.Sqrt(3 * CIRCLE_RADIUS * CIRCLE_RADIUS) * 1000) * 0.001f;
+                    heightInterval = Mathf.RoundToInt(Mathf.Sqrt(3 * CIRCLE_RADIUS * CIRCLE_RADIUS) * 1000) * 0.001f;
                 }
                 return heightInterval;
             }
@@ -36,6 +36,8 @@ namespace JH
         public static float DEFAULT_CAMERA_ORTHOGRAPHIC_SIZE = 9.95f;
 
         public static float Degree_LIMIT = 30f;
+
+        public static float HINT_LINE_LIMIT = 10f;
 
         #endregion
 

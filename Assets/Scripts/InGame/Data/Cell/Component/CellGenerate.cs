@@ -142,7 +142,6 @@ namespace JH
                         yield return null;
                     }
                 }
-                yield break;
             }
 
             private int ComputeGenerateNum()

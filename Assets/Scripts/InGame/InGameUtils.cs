@@ -6,8 +6,29 @@ namespace JH
 {
     namespace BBS
     {
+
+        /// <summary>
+        /// y = gradient * x + delta;
+        /// </summary>
+        public struct LineEquationInfo
+        {
+            public float Gradient;
+            public float Delta;
+            public bool IsPositiveDirection;
+        }
+
         public static class InGameUtils
         {
+            #region Equation
+
+            public static float ComputeGradient(float degree) => Mathf.Tan(degree * Mathf.Deg2Rad);
+            public static float ComputeDelta(float gradient, Vector2 pos) => (-gradient * pos.x) + pos.y;
+            public static float ComputeLineEquation(LineEquationInfo lineEquationInfo, float x) => lineEquationInfo.Gradient * x + lineEquationInfo.Delta;
+            public static float ComputeDistance(LineEquationInfo lineEquationInfo, Vector2 pos) =>
+                Mathf.Abs(pos.x * lineEquationInfo.Gradient - pos.y + lineEquationInfo.Delta) /
+                Mathf.Sqrt(lineEquationInfo.Gradient * lineEquationInfo.Gradient + 1);
+
+            #endregion
 
             public static bool CellVerification(Cell cell)
             {

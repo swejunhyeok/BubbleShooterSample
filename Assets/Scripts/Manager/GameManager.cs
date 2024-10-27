@@ -10,9 +10,9 @@ namespace JH
 
         #region InGame
 
-        private Dictionary<float, List<int>> _oddDetect = new Dictionary<float, List<int>>();
+        private Dictionary<int, List<int>> _oddDetect = new Dictionary<int, List<int>>();
 
-        public Dictionary<float, List<int>> OddDetect
+        public Dictionary<int, List<int>> OddDetect
         {
             get
             {
@@ -24,9 +24,9 @@ namespace JH
             }
         }
 
-        private Dictionary<float, List<int>> _evenDetect = new Dictionary<float, List<int>>();
+        private Dictionary<int, List<int>> _evenDetect = new Dictionary<int, List<int>>();
 
-        public Dictionary<float, List<int>> EvenDetect
+        public Dictionary<int, List<int>> EvenDetect
         {
             get
             {
@@ -42,20 +42,23 @@ namespace JH
         {
             using (StreamReader sr = new StreamReader(Application.dataPath + "/Resources/InGame/" + (isOdd?"odd":"even") + ".txt"))
             {
+                int linenum = 0;
                 while(!sr.EndOfStream)
                 {
+                    ++linenum;
                     string line = sr.ReadLine();
                     bool isStart = true;
-                    float degree = -1;
+                    int degree = -1;
                     List<int> indexList = new List<int>();
                     foreach (string splitString in line.Split(","))
                     {
                         if(isStart)
                         {
-                            if (float.TryParse(splitString, out float parseDegree))
+                            if (int.TryParse(splitString, out int parseDegree))
                             {
                                 degree = parseDegree;
                             }
+                            isStart = false;
                         }
                         else
                         {
