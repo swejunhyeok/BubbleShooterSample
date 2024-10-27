@@ -11,6 +11,7 @@ namespace JH
 
             #region Cell
 
+            [Header("Cell component")]
             [SerializeField]
             protected Cell _parent;
             public Cell Parent

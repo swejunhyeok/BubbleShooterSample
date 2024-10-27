@@ -21,7 +21,7 @@ namespace JH
             {
                 if(heightInterval == -1)
                 {
-                    heightInterval = Mathf.Round(Mathf.Sqrt(3 * heightInterval * heightInterval) * 1000) * 0.001f;
+                    heightInterval = Mathf.Round(Mathf.Sqrt(3 * CIRCLE_RADIUS * CIRCLE_RADIUS) * 1000) * 0.001f;
                 }
                 return heightInterval;
             }
@@ -36,6 +36,32 @@ namespace JH
         public static float DEFAULT_CAMERA_ORTHOGRAPHIC_SIZE = 9.95f;
 
         public static float Degree_LIMIT = 30f;
+
+        #endregion
+
+        #region Level data
+
+        public static string LEVEL_DATA_LEVEL_TYPE = "lt";
+        public static string LEVEL_DATA_MOVE = "move";
+        public static string LEVEL_DATA_START_ODD = "odd";
+        public static string LEVEL_DATA_BOSS_HEALTH = "bh";
+        public static string LEVEL_DATA_MISSION = "ms";
+        public static string LEVEL_DATA_STAR_SCORES = "sc";
+        
+        public static string LEVEL_DATA_MAP = "map";
+        
+        public static string LEVEL_DATA_LINE_LIST = "ll";
+        public static string LEVEL_DATA_LINE = "line";
+        
+        public static string LEVEL_DATA_CELL_TYPE = "ct";
+        public static string LEVEL_DATA_CELL_DIRECTION = "cd";
+
+        public static string LEVEL_DATA_GENERATE_INFO_LIST = "gil";
+        public static string LEVEL_DATA_GENERATE_NUM = "gn";
+        public static string LEVEL_DATA_GENERATE_WEIGHT = "gw";
+
+        public static string LEVEL_DATA_BLOCK_TYPE_LIST = "btl";
+        public static string LEVEL_DATA_BLOCK_TYPE = "bt";
 
         #endregion
 

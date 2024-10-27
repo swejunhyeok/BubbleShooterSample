@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5417255751477227461}
   - component: {fileID: 4666492303544870361}
   - component: {fileID: 522622130841988837}
+  - component: {fileID: 1095360818826172078}
   m_Layer: 0
   m_Name: Cell
   m_TagString: Untagged
@@ -45,11 +46,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b777a0fe8930de42a522554a8dd9210, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _pos: {x: 0, y: 0}
+  _index: 0
   _type: 0
-  _direction: 0
+  _direction: -1
   _isOddLine: 0
   _arroundCell: []
   _block: {fileID: 522622130841988837}
+  _generate: {fileID: 1095360818826172078}
 --- !u!114 &522622130841988837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66,3 +70,16 @@ MonoBehaviour:
   _bottomBlock: {fileID: 0}
   _middleBlock: {fileID: 0}
   _topBlock: {fileID: 0}
+--- !u!114 &1095360818826172078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6786182300204884063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d94441e158787734891a6f45a6122710, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _parent: {fileID: 4666492303544870361}

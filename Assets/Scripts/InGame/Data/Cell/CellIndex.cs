@@ -8,13 +8,14 @@ namespace JH
     {
         public enum CellDirectionType
         {
-            None = 0,
+            None = -1,
             RightUp,
             Right,
             RightDown,
             LeftDown,
             Left,
             LeftUp,
+            Cnt,
         }
 
         public static class CellIndex
@@ -29,6 +30,7 @@ namespace JH
                 public static Vector2Int LeftDownDirection = new Vector2Int(0, -1);
                 public static Vector2Int LeftDirection = new Vector2Int(-1, 0);
                 public static Vector2Int LeftUpDirection = new Vector2Int(0, 1);
+                public static Vector2Int[] Directions = { RightUpDirection, RightDirection, RightDownDirection, LeftDownDirection, LeftDirection, LeftUpDirection };
             }
 
             public static class EvenLine
@@ -39,6 +41,7 @@ namespace JH
                 public static Vector2Int LeftDownDirection= new Vector2Int(-1, -1);
                 public static Vector2Int LeftDirection = new Vector2Int(-1, 0);
                 public static Vector2Int LeftUpDirection = new Vector2Int(-1, 1);
+                public static Vector2Int[] Directions = { RightUpDirection, RightDirection, RightDownDirection, LeftDownDirection, LeftDirection, LeftUpDirection };
             }
 
             public static bool Verification(Vector2Int pos)

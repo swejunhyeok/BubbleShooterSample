@@ -1,3 +1,4 @@
+using LitJson;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,11 @@ namespace JH
 {
     namespace BBS
     {
+        public enum LevelType
+        {
+            Normal,
+            Boss,
+        }
         public class GameController : SingletonController<GameController>
         {
 
@@ -36,6 +42,7 @@ namespace JH
                 // allocate 4bit (0x0000000F)
                 // game initalize state
                 GameStart = 0x00000001,
+                GameEffect = 0x00000002,
 
                 // allocate 4 bit (0x000000F0)
                 // game play state
@@ -64,6 +71,101 @@ namespace JH
 
             #endregion
 
+            #region Level
+
+            [Header("Level")]
+            [SerializeField]
+            private LevelType _type;
+            public LevelType Type => _type;
+
+            [SerializeField]
+            private int _move;
+            public int Move
+            {
+                get => _move;
+                set
+                {
+                    _move = value;
+                }
+            }
+
+            [SerializeField]
+            private int[] _starScores = new int[4];
+            public int[] StarScores => _starScores;
+
+            [SerializeField]
+            private int _bossMaxHealth = 0;
+            public int BossMaxHealth => _bossMaxHealth;
+
+            [SerializeField]
+            private int _bossNowHealth = 0;
+            public int BossNowHealth
+            {
+                get => _bossNowHealth;
+                set
+                {
+                    _bossNowHealth = value;
+                }
+            }
+
+            #endregion
+
+            #region Map
+
+            [Header("Map")]
+            [SerializeField]
+            private Transform _trMap;
+            public Transform TrMap => _trMap;
+
+            [SerializeField]
+            private Map _map;
+            public Map Map => _map;
+
+            #endregion
+
+            #region Data load
+
+            private void LoadLevelData(int level)
+            {
+                TextAsset levelFile = Resources.Load<TextAsset>($"LevelData/{level}");
+                if(levelFile == null)
+                {
+                    return;
+                }
+                JsonData root = JsonMapper.ToObject(levelFile.text);
+
+                // Move load
+                Move = InGameUtils.ParseInt(ref root, ConstantData.LEVEL_DATA_MOVE);
+
+                // Star scores load
+                if (root.ContainsKey(ConstantData.LEVEL_DATA_STAR_SCORES))
+                {
+                    LitJson.JsonData starScores = root[ConstantData.LEVEL_DATA_STAR_SCORES];
+                    for(int i = 0; i < starScores.Count; ++i)
+                    {
+                        if (int.TryParse(starScores[i].ToString(), out int score))
+                        {
+                            _starScores[i + 1] = score;
+                        }
+                    }
+                }
+
+                // mission load
+                if(root.ContainsKey(ConstantData.LEVEL_DATA_MISSION))
+                {
+                    // TODO
+                }
+
+                // boss health load
+                _bossMaxHealth = _bossNowHealth = InGameUtils.ParseInt(ref root, ConstantData.LEVEL_DATA_BOSS_HEALTH);
+
+                LitJson.JsonData mapRoot = root[ConstantData.LEVEL_DATA_MAP];
+                _trMap.transform.position = InGameUtils.GetMapPosition();
+                _map.LoadMapData(mapRoot);
+            }
+
+            #endregion
+
             #region General
 
             private void Start()
@@ -77,6 +179,9 @@ namespace JH
                 yield return null;
 
                 Application.targetFrameRate = 120;
+                Input.multiTouchEnabled = false;
+
+                LoadLevelData(10);
             }
 
             #endregion
@@ -96,6 +201,7 @@ namespace JH
                 }
 
                 if (IsContainState(GameState.Processing_UserInput) ||
+                    IsContainState(GameState.GameEffect) ||
                     IsContainState(GameState.GameStart) ||
                     IsContainState(GameState.Done_GameEnd))
                 {
