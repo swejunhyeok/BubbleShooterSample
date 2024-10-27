@@ -67,6 +67,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _parent: {fileID: 4666492303544870361}
+  _trCell: {fileID: 5417255751477227461}
   _bottomBlock: {fileID: 0}
   _middleBlock: {fileID: 0}
   _topBlock: {fileID: 0}
@@ -83,3 +84,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _parent: {fileID: 4666492303544870361}
+  _generateDatas: []

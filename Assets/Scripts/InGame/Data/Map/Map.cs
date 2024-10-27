@@ -57,6 +57,41 @@ namespace JH
 
             #endregion
 
+            #region Cell check
+
+            [Header("Cell check")]
+            [SerializeField]
+            private List<Cell> _generateCell = new List<Cell>();
+            [SerializeField]
+            private List<Cell> _finishCell = new List<Cell>();
+
+            public bool IsNeedGenerateBlock()
+            {
+                for(int i = 0; i < _generateCell.Count; ++i)
+                {
+                    Cell targetCell = _generateCell[i].GetArroundCell((int)_generateCell[i].Direction);
+                    while(targetCell != null)
+                    {
+                        if(targetCell.Block.IsEmpty)
+                        {
+                            return true;
+                        }
+                        targetCell = targetCell.GetArroundCell((int)targetCell.Direction);
+                    }
+                }
+                return false;
+            }
+
+            public void RequsetGenerate()
+            {
+                for(int i = 0; i < _generateCell.Count; ++i)
+                {
+                    _generateCell[i].Generate.GenerateObject();
+                }
+            }
+
+            #endregion
+
             #region Data load
 
             public void LoadMapData(JsonData mapRoot)
@@ -67,7 +102,7 @@ namespace JH
                 {
                     JsonData lineRoot = lineList[i][ConstantData.LEVEL_DATA_LINE];
                     Line line = ObjectPoolController.Instance.GetLine(_trMap);
-                    line.transform.localPosition = new Vector2(_isStartOdd?0.5f:0f, ConstantData.HEIGHT_INTERVAL * i);
+                    line.transform.localPosition = new Vector2(lineRoot.Count % 2 == 1? 0.5f:0f, ConstantData.HEIGHT_INTERVAL * i);
                     line.LoadLineData(lineRoot, i);
                     _lines.Add(line);
                 }
@@ -83,6 +118,15 @@ namespace JH
                     {
                         Vector2Int pos = new Vector2Int(x, y);
                         Cell cell = GetCell(pos);
+                        if(cell.Type == CellType.GenerateCell)
+                        {
+                            _generateCell.Add(cell);
+                        }
+                        if(cell.Type == CellType.FinishCell)
+                        {
+                            _finishCell.Add(cell);
+                        }
+
                         List<Cell> arroundCell = new List<Cell>();
                         Vector2Int[] directions;
                         if(isOddLine)
@@ -96,7 +140,7 @@ namespace JH
                         for(int i = 0; i < directions.Length; ++i)
                         {
                             Vector2Int targetPos = pos + directions[i];
-                            if(CellIndex.Verification(targetPos))
+                            if(!CellIndex.Verification(targetPos))
                             {
                                 arroundCell.Add(null);
                                 continue;

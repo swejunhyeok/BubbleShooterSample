@@ -86,7 +86,7 @@ namespace JH
                     {
                         _cells[i] = ObjectPoolController.Instance.GetCell(_trLine);
                     }
-                    _cells[i].transform.localPosition = new Vector2(-ConstantData.CIRCLE_RADIUS * (ConstantData.MAX_WIDTH_NUM - 1), 0);
+                    _cells[i].transform.localPosition = new Vector2(- ConstantData.CIRCLE_RADIUS * (ConstantData.MAX_WIDTH_NUM - 1) + i, 0);
                     _cells[i].LoadCellData(lineRoot[i], _isOddLine, _index, i);
                 }
             }

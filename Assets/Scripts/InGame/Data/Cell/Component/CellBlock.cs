@@ -142,6 +142,26 @@ namespace JH
 
             #endregion
 
+            #region General
+
+            public override void Init()
+            {
+                base.Init();
+                _bottomBlock = null;
+                _middleBlock = null;
+                _topBlock = null;
+            }
+
+            public override void Dispose()
+            {
+                base.Dispose();
+                _bottomBlock = null;
+                _middleBlock = null;
+                _topBlock = null;
+            }
+
+            #endregion
+
         }
     }
 }

@@ -82,9 +82,96 @@ namespace JH
                 {
                     return;
                 }
-                BlockType type = GetBlockType();
-                Parent.Block.CreateBlock(type);
+                StartCoroutine(GenerateCoroutine());
             }
+
+
+            private struct MoveInfo
+            {
+                public Block Block;
+                public Cell TargetCell;
+            }
+            private IEnumerator GenerateCoroutine()
+            {
+                int generateNum = ComputeGenerateNum();
+                for(int i = 0; i < generateNum; ++i)
+                {
+                    BlockType type = GetBlockType();
+                    Parent.Block.CreateBlock(type);
+
+                    List<MoveInfo> moveInfos = new List<MoveInfo>();
+                    Cell targetCell = Parent.GetArroundCell((int)Parent.Direction);
+                    if(targetCell != null && targetCell.Type != CellType.FinishCell)
+                    {
+                        moveInfos.Add(new MoveInfo()
+                        {
+                            Block = Parent.Block.MiddleBlock,
+                            TargetCell = targetCell,
+                        });
+                    }
+                    while (targetCell != null && targetCell.Block.HasMiddleBlock)
+                    {
+                        Block middleBlock = targetCell.Block.MiddleBlock;
+                        targetCell = targetCell.GetArroundCell((int)targetCell.Direction);
+                        if (targetCell != null)
+                        {
+                            moveInfos.Add(new MoveInfo()
+                            {
+                                Block = middleBlock,
+                                TargetCell = targetCell,
+                            });
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    int totalMoveNum = moveInfos.Count;
+
+                    for (int j = moveInfos.Count - 1; j >= 0; --j)
+                    {
+                        moveInfos[j].Block.RemovePivotCell();
+                        moveInfos[j].TargetCell.Block.AddBlock(moveInfos[j].Block, false);
+                        moveInfos[j].TargetCell.Block.MiddleBlock.Move.SetMoveEndAction(() => --totalMoveNum);
+                        moveInfos[j].TargetCell.Block.MiddleBlock.Move.Move(BlockMove.MoveType.BlockFill);
+                    }
+
+                    while(totalMoveNum != 0)
+                    {
+                        yield return null;
+                    }
+                }
+                yield break;
+            }
+
+            private int ComputeGenerateNum()
+            {
+                int generateNum = 0;
+                Cell targetCell = Parent.GetArroundCell((int)Parent.Direction);
+                while(targetCell != null && targetCell.Block.IsEmpty)
+                {
+                    ++generateNum;
+                    targetCell = targetCell.GetArroundCell((int)targetCell.Direction);
+                }
+                return generateNum;
+            }
+
+            #region General
+
+            public override void Init()
+            {
+                base.Init();
+                StopAllCoroutines();
+            }
+
+            public override void Dispose()
+            {
+                base.Dispose();
+                StopAllCoroutines();
+            }
+
+            #endregion
         }
     }
 }

@@ -35,6 +35,7 @@ namespace JH
 
             [SerializeField]
             private CellDirectionType _direction = CellDirectionType.None;
+            public CellDirectionType Direction => _direction;
 
             [SerializeField]
             private bool _isOddLine = false;
@@ -49,6 +50,14 @@ namespace JH
             public Cell LeftUpCell => _arroundCell[(int)CellDirectionType.LeftUp];
 
             public void SetArroundCell(List<Cell> arroundCell) => _arroundCell = new List<Cell>(arroundCell);
+            public Cell GetArroundCell(int index)
+            {
+                if(index < 0 || index >= _arroundCell.Count)
+                {
+                    return null;
+                }
+                return _arroundCell[index];
+            }
 
             #endregion
 
@@ -81,6 +90,26 @@ namespace JH
                         Generate.LoadGenerateData(cellRoot[ConstantData.LEVEL_DATA_GENERATE_INFO_LIST]);
                     }
                 }
+            }
+
+            #endregion
+
+            #region General
+
+            public override void Init()
+            {
+                base.Init();
+                
+                _block.Init();
+                _generate.Init();
+            }
+
+            public override void Dispose()
+            {
+                base.Dispose();
+
+                _block.Dispose();
+                _generate.Dispose();
             }
 
             #endregion

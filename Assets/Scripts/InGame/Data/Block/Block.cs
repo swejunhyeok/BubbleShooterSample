@@ -74,6 +74,7 @@ namespace JH
             public void ChangePivotCell(Cell cell, bool isResetPosition)
             {
                 _pivotCell = cell;
+                transform.parent = cell.transform;
                 if(isResetPosition)
                 {
                     transform.localPosition = Vector3.zero;

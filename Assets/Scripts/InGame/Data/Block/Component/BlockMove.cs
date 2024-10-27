@@ -17,6 +17,13 @@ namespace JH
                 BlockShoot,
             }
 
+            private System.Action _moveEndAction;
+
+            public void SetMoveEndAction(System.Action action)
+            {
+                _moveEndAction += action;
+            }
+
             public void Move(MoveType type)
             {
                 OnMoveStart(type);
@@ -35,7 +42,7 @@ namespace JH
                 StartCoroutine(MoveMultiPositions(type, targetPositions));
             }
 
-            protected IEnumerator MoveLocalPositionZero(MoveType type, float duration = 0.25f)
+            protected IEnumerator MoveLocalPositionZero(MoveType type, float duration = 0.5f)
             {
                 float timeDepth = InGameUtils.GetTimeDepth(duration);
                 float deltaSum = 0f;
@@ -173,6 +180,8 @@ namespace JH
                 {
                     Parent.State.SetState(BlockStateType.Idle);
                 }
+                _moveEndAction?.Invoke();
+                _moveEndAction = null;
             }
 
             protected virtual void OnBlockFillEnd() { }
@@ -185,12 +194,14 @@ namespace JH
             public override void Init()
             {
                 base.Init();
+                _moveEndAction = null;
                 StopAllCoroutines();
             }
 
             public override void Dispose()
             {
                 base.Dispose();
+                _moveEndAction = null;
                 StopAllCoroutines();
             }
 

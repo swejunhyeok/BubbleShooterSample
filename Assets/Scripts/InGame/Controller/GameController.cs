@@ -162,6 +162,15 @@ namespace JH
                 LitJson.JsonData mapRoot = root[ConstantData.LEVEL_DATA_MAP];
                 _trMap.transform.position = InGameUtils.GetMapPosition();
                 _map.LoadMapData(mapRoot);
+
+
+                RemoveGameState(GameState.GameStart);
+                bool isNeed = Map.IsNeedGenerateBlock();
+                if(isNeed)
+                {
+                    Map.RequsetGenerate();
+                    AddGameState(GameState.GameEffect);
+                }
             }
 
             #endregion
