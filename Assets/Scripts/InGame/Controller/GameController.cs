@@ -203,6 +203,8 @@ namespace JH
                 LoadLevelData(10);
             }
 
+            public System.Action IdleAction = null;
+
             private void Update()
             {
                 if(IsContainState(GameState.GenerateEffect))
@@ -210,6 +212,8 @@ namespace JH
                     if(Map.CheckGenerateBlock())
                     {
                         RemoveGameState(GameState.GenerateEffect);
+                        IdleAction?.Invoke();
+                        IdleAction = null;
                     }
                 }
             }

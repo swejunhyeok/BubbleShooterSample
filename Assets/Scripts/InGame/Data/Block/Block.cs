@@ -39,6 +39,14 @@ namespace JH
 
             [Header("Block component")]
             [SerializeField]
+            private BlockCache _cache;
+            public BlockCache Cache => _cache;
+
+            [SerializeField]
+            private BlockHit _hit;
+            public BlockHit Hit => _hit;
+
+            [SerializeField]
             private BlockMatch _match;
             public BlockMatch Match => _match;
 
@@ -98,19 +106,27 @@ namespace JH
                 _pivotCell = null;
                 _attribute = null;
 
-                if(Match != null)
+                if (Cache != null)
+                {
+                    Cache.Init();
+                }
+                if (Hit != null)
+                {
+                    Hit.Init();
+                }
+                if (Match != null)
                 {
                     Match.Init();
                 }
-                if(Move != null)
+                if (Move != null)
                 {
                     Move.Init();
                 }
-                if(Sprite != null)
+                if (Sprite != null)
                 {
                     Sprite.Init();
                 }
-                if(State != null)
+                if (State != null)
                 {
                     State.Init();
                 }
@@ -120,6 +136,14 @@ namespace JH
             {
                 base.Dispose();
 
+                if (Cache != null)
+                {
+                    Cache.Dispose();
+                }
+                if (Hit != null)
+                {
+                    Hit.Dispose();
+                }
                 if (Match != null)
                 {
                     Match.Dispose();
@@ -147,6 +171,14 @@ namespace JH
 
             public virtual void Reset()
             {
+                if(TryGetComponent<BlockCache>(out var cache))
+                {
+                    _cache = cache;
+                }
+                if(TryGetComponent<BlockHit>(out var hit))
+                {
+                    _hit = hit;
+                }
                 if(TryGetComponent<BlockMatch>(out var match))
                 {
                     _match = match;

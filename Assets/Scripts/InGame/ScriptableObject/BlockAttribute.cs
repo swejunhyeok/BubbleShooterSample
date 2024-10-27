@@ -62,6 +62,7 @@ namespace JH
             Bomb = 0x004,
             LargeBomb = 0x008,
             Fairy = 0x010,
+            ReduceMission = 0x020,
         }
 
         [CreateAssetMenu(fileName = "Block Attribute", menuName = "JH/Bubble Shooter Sample/Block Attribute")]
@@ -126,6 +127,13 @@ namespace JH
             public HitEffectType HitEffect
             {
                 get { return _hitEffect; }
+            }
+
+            [SerializeField]
+            private BlockAttribute _hitChangeBlock;
+            public BlockAttribute HitChangeBlock
+            {
+                get { return _hitChangeBlock; }
             }
 
             #endregion

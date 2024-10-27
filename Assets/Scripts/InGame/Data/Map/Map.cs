@@ -113,6 +113,89 @@ namespace JH
 
             #endregion
 
+            #region Fall check
+
+            private class FallInfo
+            {
+                public bool IsArriveEnd = false;
+                public List<Cell> ConnectedCell = new List<Cell>();
+            }
+
+            public void FallCheck()
+            {
+                List<FallInfo> fallInfos = new List<FallInfo>();
+                List<Cell> visitCell = new List<Cell>();
+                for(int y = 0; y < _lines.Count; ++y)
+                {
+                    for(int x = 0; x < ConstantData.MAX_WIDTH_NUM; ++x)
+                    {
+                        Cell cell = GetCell(x, y);
+                        if(visitCell.IndexOf(cell) != -1)
+                        {
+                            continue;
+                        }
+                        visitCell.Add(cell);
+                        if(cell == null)
+                        {
+                            continue;
+                        }
+                        if(cell.Block.HasMiddleBlock)
+                        {
+                            FallInfo fallInfo = new FallInfo();
+                            GetConnectedCell(cell, fallInfo, visitCell);
+                            fallInfos.Add(fallInfo);
+                        }
+                    }
+                }
+
+                bool isFall = false;
+                for(int i = 0; i < fallInfos.Count; ++i)
+                {
+                    if (!fallInfos[i].IsArriveEnd)
+                    {
+                        isFall = true;
+                        for(int j = 0; j < fallInfos[i].ConnectedCell.Count; ++j)
+                        {
+                            fallInfos[i].ConnectedCell[j].Block.MiddleBlock.Hit.FallBlock();
+                        }
+                    }
+                }
+
+                GameController.Instance.RemoveGameState(GameController.GameState.Processing_UserInput);
+                if (isFall)
+                {
+                    if(IsNeedGenerateBlock())
+                    {
+                        GameController.Instance.AddGameState(GameController.GameState.GenerateEffect);
+                        RequsetGenerate();
+                    }
+                }
+            }
+
+            private void GetConnectedCell(Cell pivotCell, FallInfo fallInfo, List<Cell> visitCell)
+            {
+                for(int i = 0; i < pivotCell.ArroundCell.Count; ++i)
+                {
+                    if (visitCell.IndexOf(pivotCell.ArroundCell[i]) != -1)
+                    {
+                        continue;
+                    }
+                    visitCell.Add(pivotCell.ArroundCell[i]);
+                    if (pivotCell.ArroundCell[i] == null)
+                    {
+                        continue;
+                    }
+                    if (pivotCell.ArroundCell[i].Block.HasMiddleBlock)
+                    {
+                        fallInfo.ConnectedCell.Add(pivotCell.ArroundCell[i]);
+                        fallInfo.IsArriveEnd |= (pivotCell.ArroundCell[i].Pos.y == _lines.Count - 1);
+                        GetConnectedCell(pivotCell.ArroundCell[i], fallInfo, visitCell);
+                    }
+                }
+            }
+
+            #endregion
+
             #region Data load
 
             public void LoadMapData(JsonData mapRoot)

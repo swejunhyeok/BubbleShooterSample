@@ -79,6 +79,7 @@ namespace JH
                     UseBigBombCircle();
                 }
 
+                AddDefaultCircle();
                 SetCircleImage();
 
                 return firstType;

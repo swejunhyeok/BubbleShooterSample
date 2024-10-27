@@ -42,6 +42,7 @@ namespace JH
 
             [SerializeField]
             private List<Cell> _arroundCell = new List<Cell>();
+            public List<Cell> ArroundCell => _arroundCell;
             public Cell RightUpCell => _arroundCell[(int)CellDirectionType.RightUp];
             public Cell RightCell => _arroundCell[(int)CellDirectionType.Right];
             public Cell RightDownCell => _arroundCell[(int)CellDirectionType.RightDown];
@@ -80,6 +81,10 @@ namespace JH
             private CellGenerate _generate;
             public CellGenerate Generate => _generate;
 
+            [SerializeField]
+            private CellEffect _effect;
+            public CellEffect Effect => _effect;
+
             #endregion
 
             #region Data load
@@ -110,6 +115,7 @@ namespace JH
                 
                 _block.Init();
                 _generate.Init();
+                _effect.Init();
             }
 
             public override void Dispose()
@@ -118,6 +124,7 @@ namespace JH
 
                 _block.Dispose();
                 _generate.Dispose();
+                _effect.Dispose();
             }
 
             #endregion
@@ -135,6 +142,10 @@ namespace JH
                 if(TryGetComponent<CellGenerate>(out var generate))
                 {
                     _generate = generate;
+                }
+                if(TryGetComponent<CellEffect>(out var effect))
+                {
+                    _effect = effect;
                 }
             }
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 
 namespace JH
@@ -55,6 +56,26 @@ namespace JH
                 }
             }
 
+            public Block HighestBlock
+            {
+                get
+                {
+                    if(HasTopBlock)
+                    {
+                        return TopBlock;
+                    }
+                    if(HasMiddleBlock)
+                    {
+                        return MiddleBlock;
+                    }
+                    if(HasBottomBlock)
+                    {
+                        return BottomBlock;
+                    }
+                    return null;
+                }
+            }
+
             #endregion
 
             #region Block manage
@@ -63,6 +84,20 @@ namespace JH
             {
                 CreateBlock(type, false);
                 MiddleBlock.transform.position = UIController.Instance.PosMainSponer;
+                MiddleBlock.Move.SetMoveEndAction(() =>
+                {
+                    BlockType type = MiddleBlock.Attribute.Type;
+                    MiddleBlock.Match.RunMatch();
+                    for(int i = 0; i < Parent.ArroundCell.Count; ++i)
+                    {
+                        if (Parent.ArroundCell[i] == null)
+                        {
+                            continue;
+                        }
+                        Parent.ArroundCell[i].Block.Hit(LayerType.Middle, type, HitConditionType.GetShot);
+                    }
+                    GameController.Instance.Map.FallCheck();
+                });
                 MiddleBlock.Move.Move(BlockMove.MoveType.BlockShoot, targetPositions);
             }
 
@@ -144,6 +179,45 @@ namespace JH
                 if(TopBlock == block)
                 {
                     _topBlock = null;
+                }
+            }
+
+            #endregion
+
+            #region Hit
+
+            public void Hit(LayerType layer, BlockType block, HitConditionType hitType, List<Vector2Int> hitPositions = null, System.Action successCallback = null)
+            {
+                if (HighestBlock == null)
+                {
+                    return;
+                }
+                if ((layer & LayerType.Top) == LayerType.Top)
+                {
+                    if (HighestBlock == TopBlock)
+                    {
+                        TopBlock.Cache.HitPositions = hitPositions;
+                        TopBlock.Hit.Hit(hitType, block, successCallback);
+                        return;
+                    }
+                }
+                if ((layer & LayerType.Middle) == LayerType.Middle)
+                {
+                    if (HighestBlock == MiddleBlock)
+                    {
+                        MiddleBlock.Cache.HitPositions = hitPositions;
+                        MiddleBlock.Hit.Hit(hitType, block, successCallback);
+                        return;
+                    }
+                }
+                if ((layer & LayerType.Bottom) == LayerType.Bottom)
+                {
+                    if (HighestBlock == BottomBlock)
+                    {
+                        BottomBlock.Cache.HitPositions = hitPositions;
+                        BottomBlock.Hit.Hit(hitType, block, successCallback);
+                        return;
+                    }
                 }
             }
 
