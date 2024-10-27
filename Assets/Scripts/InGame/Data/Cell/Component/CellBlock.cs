@@ -59,13 +59,20 @@ namespace JH
 
             #region Block manage
 
-            public void CreateBlock(BlockType type)
+            public void ShootBlock(BlockType type, List<Vector3> targetPositions)
+            {
+                CreateBlock(type, false);
+                MiddleBlock.transform.position = UIController.Instance.PosMainSponer;
+                MiddleBlock.Move.Move(BlockMove.MoveType.BlockShoot, targetPositions);
+            }
+
+            public void CreateBlock(BlockType type, bool isResetPosition = true)
             {
                 Block block = ObjectPoolController.Instance.GetBlock(_trCell);
 
                 block.SetAttribute(type);
 
-                AddBlock(block);
+                AddBlock(block, isResetPosition);
             }
 
             public bool AddBlock(Block block, bool isResetPosition = true)

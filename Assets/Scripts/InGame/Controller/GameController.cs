@@ -42,7 +42,7 @@ namespace JH
                 // allocate 4bit (0x0000000F)
                 // game initalize state
                 GameStart = 0x00000001,
-                GameEffect = 0x00000002,
+                GenerateEffect = 0x00000002,
 
                 // allocate 4 bit (0x000000F0)
                 // game play state
@@ -86,6 +86,7 @@ namespace JH
                 set
                 {
                     _move = value;
+                    UIController.Instance.SetMoveText(_move.ToString());
                 }
             }
 
@@ -105,6 +106,7 @@ namespace JH
                 set
                 {
                     _bossNowHealth = value;
+                    UIController.Instance.BossHealthSet((float)_bossNowHealth / _bossMaxHealth);
                 }
             }
 
@@ -168,7 +170,7 @@ namespace JH
                 bool isNeed = Map.IsNeedGenerateBlock();
                 if (isNeed)
                 {
-                    AddGameState(GameState.GameEffect);
+                    AddGameState(GameState.GenerateEffect);
                     StartCoroutine(CheckGenerateBlock());
                 }
             }
@@ -195,10 +197,21 @@ namespace JH
                 Application.targetFrameRate = 60;
                 Input.multiTouchEnabled = false;
 
-                yield return new WaitForSeconds(1);
+                yield return null;
 
-
+                UIController.Instance.Sponer.Init();
                 LoadLevelData(10);
+            }
+
+            private void Update()
+            {
+                if(IsContainState(GameState.GenerateEffect))
+                {
+                    if(Map.CheckGenerateBlock())
+                    {
+                        RemoveGameState(GameState.GenerateEffect);
+                    }
+                }
             }
 
             #endregion
@@ -209,13 +222,16 @@ namespace JH
             [SerializeField]
             private List<HintLine> _hintLines = new List<HintLine>();
 
+            [SerializeField]
+            private List<HintLineInfo> _hintLineInfo = new List<HintLineInfo>();
+
 
             private Cell _previouseCell;
 
             private void InputTouch(Vector2 touchPosition, TouchPhase type)
             {
                 if (IsContainState(GameState.Processing_UserInput) ||
-                    IsContainState(GameState.GameEffect) ||
+                    IsContainState(GameState.GenerateEffect) ||
                     IsContainState(GameState.GameStart) ||
                     IsContainState(GameState.Done_GameEnd))
                 {
@@ -255,15 +271,24 @@ namespace JH
                 {
                     _hintLines[i].OffHint();
                 }
+                UIController.Instance.BossUIAlphaSet(1.0f);
+                _hintLineInfo.Clear();
             }
 
             public void OnTouchUp(Vector2 touchPosition)
             {
                 if(_previouseCell == null)
                 {
-                    Debug.Log("Call");
                     return;
                 }
+                List<Vector3> targetPositions = new List<Vector3>();
+                for(int i = 0; i < _hintLineInfo.Count; ++i)
+                {
+                    targetPositions.Add(_hintLineInfo[i].Target);
+                }
+                --Move;
+                _previouseCell.Block.ShootBlock(UIController.Instance.Sponer.PopCircle(), targetPositions);
+                AddGameState(GameState.Processing_UserInput);
                 TouchCancle();
             }
 
@@ -394,6 +419,7 @@ namespace JH
                             Degree = previousDegree,
                         });
 
+                        _hintLineInfo = new List<HintLineInfo>(hintLineInfos);
                         float totalDistance = 0;
                         for (int i = 0; i < hintLineInfos.Count; ++i)
                         {
@@ -408,7 +434,7 @@ namespace JH
                             {
                                 totalDistance += distance;
                             }
-                            _hintLines[i].SetHint(Color.white, hintLineInfos[i].Pivot, distance, hintLineInfos[i].Degree - 90);
+                            _hintLines[i].SetHint(UIController.Instance.Sponer.PeekCircle(), hintLineInfos[i].Pivot, distance, hintLineInfos[i].Degree - 90);
                             if (isLimit)
                             {
                                 break;
@@ -419,10 +445,12 @@ namespace JH
                 else if(previouseEmptyCellList.Count != 0)
                 {
                     targetCell = previouseEmptyCellList[0];
-                    _hintLines[0].SetHint(Color.white, sponerPosition, (previouseEmptyCellList[0].transform.position - (Vector3)sponerPosition).magnitude, 0);
+                    _hintLineInfo.Add(new HintLineInfo() { Target = sponerPosition});
+                    _hintLines[0].SetHint(UIController.Instance.Sponer.PeekCircle(), sponerPosition, (previouseEmptyCellList[0].transform.position - (Vector3)sponerPosition).magnitude, 0);
                 }
                 if (targetCell != null)
                 {
+                    UIController.Instance.BossUIAlphaSet(0.5f);
                     _previouseCell = targetCell;
                     _previouseCell.SetHintEnable(true);
                 }

@@ -81,6 +81,27 @@ namespace JH
                 }
                 return false;
             }
+            
+            public bool CheckGenerateBlock()
+            {
+                for (int i = 0; i < _generateCell.Count; ++i)
+                {
+                    Cell targetCell = _generateCell[i].GetArroundCell((int)_generateCell[i].Direction);
+                    while (targetCell != null)
+                    {
+                        if (targetCell.Block.IsEmpty)
+                        {
+                            return false;
+                        }
+                        if(targetCell.Block.MiddleBlock.State.State == BlockStateType.Move)
+                        {
+                            return false;
+                        }
+                        targetCell = targetCell.GetArroundCell((int)targetCell.Direction);
+                    }
+                }
+                return true;
+            }
 
             public void RequsetGenerate()
             {

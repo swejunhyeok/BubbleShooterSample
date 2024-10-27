@@ -39,6 +39,8 @@ namespace JH
 
         public static float HINT_LINE_LIMIT = 10f;
 
+        public static int NEROS_BEEDS_NUM = 4;
+
         #endregion
 
         #region Level data

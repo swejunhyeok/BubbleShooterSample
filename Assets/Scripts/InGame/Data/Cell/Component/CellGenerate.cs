@@ -97,7 +97,7 @@ namespace JH
                 for(int i = 0; i < generateNum; ++i)
                 {
                     BlockType type = GetBlockType();
-                    Parent.Block.CreateBlock(type);
+                    Parent.Block.CreateBlock(type, true);
 
                     List<MoveInfo> moveInfos = new List<MoveInfo>();
                     Cell targetCell = Parent.GetArroundCell((int)Parent.Direction);
