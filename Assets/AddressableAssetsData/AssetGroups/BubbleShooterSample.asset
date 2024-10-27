@@ -12,11 +12,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
   m_Name: BubbleShooterSample
   m_EditorClassIdentifier: 
-  m_GroupName: Packed Assets
+  m_GroupName: BubbleShooterSample
   m_Data:
     m_SerializedData: []
   m_GUID: 13a292403c0c66447ae0d627f4f64195
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: a32d0d69d12b1ba45be35eacbe7763ba
+    m_Address: BlueCircle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 524f16ab53fbffc45b586409fbe044d9
+    m_Address: RedCircle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 585c8d8485d79e9429ccff73eb4046ac
+    m_Address: YellowCircle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 323ccb3168c886d489c328a30791e3e5
+    m_Address: BlueFairyCircle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b35953c113b090498ad02d52676cce7
+    m_Address: RedFairyCircle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f458fcdaac901b548b10107508c20413
+    m_Address: YellowFairyCircle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 880b06df478dfd04c8974f75e77675a5
+    m_Address: BigBombCircle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5016a69f7c52d234d9aef47d21ba408d
+    m_Address: BombCircle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: abd25e29d0d9e474cb416805eb110512, type: 2}
   m_SchemaSet:

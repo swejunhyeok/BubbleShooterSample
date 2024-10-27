@@ -13,6 +13,20 @@ namespace JH
             private Block _parent;
             public Block Parent => _parent;
 
+            #region General
+
+            public virtual void Init()
+            {
+
+            }
+
+            public virtual void Dispose()
+            {
+
+            }
+
+            #endregion
+
             #region Editor
 
 #if UNITY_EDITOR

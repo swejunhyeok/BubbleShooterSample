@@ -16,5 +16,6 @@ MonoBehaviour:
   _health: 1
   _layer: 256
   _color: 4
+  _sprBlock: {fileID: 21300000, guid: fd8c6d39c0f08574789ee761c8344726, type: 3}
   _hitCondition: 5
   _hitEffect: 1

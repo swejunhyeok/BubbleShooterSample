@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e0e770437113a4db760a5033c98378, type: 3}
   m_Name: BombCircle
   m_EditorClassIdentifier: 
-  _type: 0
-  _health: 0
-  _layer: 0
+  _type: 102
+  _health: 1
+  _layer: 256
   _color: 0
-  _hitCondition: 0
-  _hitEffect: 0
+  _sprBlock: {fileID: 21300000, guid: 5789390e766b00e45b09d0ba464ea19e, type: 3}
+  _hitCondition: 12
+  _hitEffect: 5

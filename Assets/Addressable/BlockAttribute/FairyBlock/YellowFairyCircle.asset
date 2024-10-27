@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e0e770437113a4db760a5033c98378, type: 3}
   m_Name: YellowFairyCircle
   m_EditorClassIdentifier: 
-  _type: 0
-  _health: 0
-  _layer: 0
-  _color: 0
-  _hitCondition: 0
-  _hitEffect: 0
+  _type: 112
+  _health: 1
+  _layer: 256
+  _color: 2
+  _sprBlock: {fileID: 21300000, guid: 451fc2dc13b8a8641bb0b5ee5f286c9c, type: 3}
+  _hitCondition: 5
+  _hitEffect: 17

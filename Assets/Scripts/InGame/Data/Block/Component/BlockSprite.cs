@@ -4,18 +4,53 @@ using UnityEngine;
 
 namespace JH
 {
-    public class BlockSprite : MonoBehaviour
+    namespace BBS
     {
-        // Start is called before the first frame update
-        void Start()
+        public class BlockSprite : BlockComponent
         {
-        
-        }
+            #region Sprtie
 
-        // Update is called once per frame
-        void Update()
-        {
-        
+            [Header("Sprtie")]
+            [SerializeField]
+            private SpriteRenderer _srMain;
+
+            [SerializeField]
+            private SpriteRenderer _srFairy;
+
+            public void SetMainSpriteSorting()
+            {
+                if(!Parent.HasAttribute)
+                {
+                    return;
+                }
+                if(Parent.Attribute.IsTopLayer)
+                {
+                    _srMain.sortingLayerID = SortingLayer.NameToID("Top");
+                    return;
+                }
+                if(Parent.Attribute.IsMiddleLayer)
+                {
+                    _srMain.sortingLayerID = SortingLayer.NameToID("Middle");
+                    return;
+                }
+                if(Parent.Attribute.IsBottomLayer)
+                {
+                    _srMain.sortingLayerID = SortingLayer.NameToID("Bottom");
+                    return;
+                }
+            }
+
+            public void SetMainSprite(Sprite sprite)
+            {
+                _srMain.sprite = sprite;
+            }
+
+            public void SetFairyEnable(bool isEnable)
+            {
+                _srFairy.enabled = isEnable;
+            }
+
+            #endregion
         }
     }
 }

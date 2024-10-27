@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e0e770437113a4db760a5033c98378, type: 3}
   m_Name: RedFairyCircle
   m_EditorClassIdentifier: 
-  _type: 0
-  _health: 0
-  _layer: 0
-  _color: 0
-  _hitCondition: 0
-  _hitEffect: 0
+  _type: 111
+  _health: 1
+  _layer: 256
+  _color: 1
+  _sprBlock: {fileID: 21300000, guid: f28c527bf1d4cba4b901464cd0b67f9b, type: 3}
+  _hitCondition: 5
+  _hitEffect: 17
