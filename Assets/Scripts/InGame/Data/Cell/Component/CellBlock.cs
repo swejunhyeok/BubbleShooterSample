@@ -84,20 +84,31 @@ namespace JH
             {
                 CreateBlock(type, false);
                 MiddleBlock.transform.position = UIController.Instance.PosMainSponer;
-                MiddleBlock.Move.SetMoveEndAction(() =>
+                if (type == BlockType.BigBombCircle)
                 {
-                    BlockType type = MiddleBlock.Attribute.Type;
-                    MiddleBlock.Match.RunMatch();
-                    for(int i = 0; i < Parent.ArroundCell.Count; ++i)
+                    MiddleBlock.Move.SetMoveEndAction(() =>
                     {
-                        if (Parent.ArroundCell[i] == null)
+                        Parent.Effect.RunLargeBombEffect();
+                        GameController.Instance.Map.FallCheck();
+                    });
+                }
+                else
+                {
+                    MiddleBlock.Move.SetMoveEndAction(() =>
+                    {
+                        BlockType type = MiddleBlock.Attribute.Type;
+                        MiddleBlock.Match.RunMatch();
+                        for (int i = 0; i < Parent.ArroundCell.Count; ++i)
                         {
-                            continue;
+                            if (Parent.ArroundCell[i] == null)
+                            {
+                                continue;
+                            }
+                            Parent.ArroundCell[i].Block.Hit(LayerType.Middle, type, HitConditionType.GetShot);
                         }
-                        Parent.ArroundCell[i].Block.Hit(LayerType.Middle, type, HitConditionType.GetShot);
-                    }
-                    GameController.Instance.Map.FallCheck();
-                });
+                        GameController.Instance.Map.FallCheck();
+                    });
+                }
                 MiddleBlock.Move.Move(BlockMove.MoveType.BlockShoot, targetPositions);
             }
 

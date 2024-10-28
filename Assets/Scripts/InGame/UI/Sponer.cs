@@ -39,7 +39,7 @@ namespace JH
                 _sponerCount = 3;
                 _sponerCircles[2].gameObject.SetActive(true);
                 _sponerInfo.Insert(0, BlockType.BigBombCircle);
-                _sponerCircles[0].SetCircle(BlockType.BigBombCircle);
+                SetCircleImage();
             }
 
             public void UseBigBombCircle()
@@ -79,7 +79,6 @@ namespace JH
                     UseBigBombCircle();
                 }
 
-                AddDefaultCircle();
                 SetCircleImage();
 
                 return firstType;
@@ -87,6 +86,10 @@ namespace JH
 
             public void ChangeCircle()
             {
+                if (GameController.Instance.State != GameController.GameState.Idle)
+                {
+                    return;
+                }
                 BlockType firstType = _sponerInfo[0];
                 _sponerInfo.RemoveAt(0);
                 _sponerInfo.Add(firstType);

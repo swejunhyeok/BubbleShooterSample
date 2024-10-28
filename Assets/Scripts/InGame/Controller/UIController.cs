@@ -109,6 +109,10 @@ namespace JH
 
             public void OnClickNerosBeeds()
             {
+                if(GameController.Instance.State != GameController.GameState.Idle)
+                {
+                    return;
+                }
                 --GameController.Instance.Move;
                 Sponer.PopCircle();
                 AddNerosBeedsCount();

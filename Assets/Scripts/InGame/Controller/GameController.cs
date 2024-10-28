@@ -330,7 +330,12 @@ namespace JH
                     targetPositions.Add(_hintLineInfo[i].Target);
                 }
                 --Move;
-                _previouseCell.Block.ShootBlock(UIController.Instance.Sponer.PopCircle(), targetPositions);
+                BlockType popCircleType = UIController.Instance.Sponer.PopCircle();
+                _previouseCell.Block.ShootBlock(popCircleType, targetPositions);
+                if (popCircleType != BlockType.BigBombCircle)
+                {
+                    UIController.Instance.Sponer.AddDefaultCircle();
+                }
                 AddGameState(GameState.Processing_UserInput);
                 TouchCancle();
             }
