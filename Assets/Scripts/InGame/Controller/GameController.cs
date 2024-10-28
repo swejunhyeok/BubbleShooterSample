@@ -467,14 +467,31 @@ namespace JH
                     }
                     if (cell.Block.IsEmpty)
                     {
-                        int y = detectedIndex[i] / ConstantData.MAX_WIDTH_NUM;
-                        if (y != previouseY)
+                        bool isExistNearBlock = false;
+                        for(int j = 0; j < cell.ArroundCell.Count; ++j)
                         {
-                            previouseY = y;
-                            previouseEmptyCellList = new List<Cell>(emptyCellList);
-                            emptyCellList.Clear();
+                            Cell arroundCell = cell.ArroundCell[j];
+                            if(arroundCell == null)
+                            {
+                                continue;
+                            }
+                            if(arroundCell.Block.HasMiddleBlock)
+                            {
+                                isExistNearBlock = true;
+                                break;
+                            }
                         }
-                        emptyCellList.Add(cell);
+                        if (isExistNearBlock)
+                        {
+                            int y = detectedIndex[i] / ConstantData.MAX_WIDTH_NUM;
+                            if (y != previouseY)
+                            {
+                                previouseY = y;
+                                previouseEmptyCellList = new List<Cell>(emptyCellList);
+                                emptyCellList.Clear();
+                            }
+                            emptyCellList.Add(cell);
+                        }
                     }
                     else
                     {
