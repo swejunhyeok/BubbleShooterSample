@@ -41,6 +41,17 @@ namespace JH
             private GameObject _prefabCell;
             [SerializeField]
             private GameObject _prefabBlock;
+            [SerializeField]
+            private GameObject _prefabFairy;
+
+            #endregion
+
+            #region Running object
+
+            [Header("Running object")]
+            [SerializeField]
+            private List<Fairy> _runningFairyObject = new List<Fairy>();
+            public int RunningFairyObjectNum => _runningFairyObject.Count;
 
             #endregion
 
@@ -94,6 +105,35 @@ namespace JH
                 _objectPoolBlock.Dispose(block);
             }
 
+            private ObjectPool<Fairy> _objectPoolFairy = new ObjectPool<Fairy>();
+            public Fairy GetFairy(Transform parent = null)
+            {
+                Fairy fairy = _objectPoolFairy.GetObject();
+                fairy.gameObject.SetActive(true);
+                if(parent != null)
+                {
+                    fairy.transform.parent = parent;
+                }
+                if(_runningFairyObject.Count == 0)
+                {
+                    GameController.Instance.AddGameState(GameController.GameState.FairyEffect);
+                }
+                _runningFairyObject.Add(fairy);
+                return fairy;
+            }
+            public void Dispose(Fairy fairy)
+            {
+                if(_runningFairyObject.IndexOf(fairy) != -1)
+                {
+                    _runningFairyObject.Remove(fairy);
+                }
+                if (_runningFairyObject.Count == 0)
+                {
+                    GameController.Instance.RemoveGameState(GameController.GameState.FairyEffect);
+                }
+                _objectPoolFairy.Dispose(fairy);
+            }
+
             #endregion
 
             #region General
@@ -103,6 +143,7 @@ namespace JH
                 _objectPoolCell.Init(_prefabCell, transform);
                 _objectPoolBlock.Init(_prefabBlock, transform);
                 _objectPoolLine.Init(_prefabLine, transform);
+                _objectPoolFairy.Init(_prefabFairy, transform);
             }
 
             #endregion

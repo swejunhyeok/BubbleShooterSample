@@ -91,6 +91,7 @@ namespace JH
                 public Block Block;
                 public Cell TargetCell;
             }
+            private int _totalMoveNum = 0;
             private IEnumerator GenerateCoroutine()
             {
                 int generateNum = ComputeGenerateNum();
@@ -98,6 +99,7 @@ namespace JH
                 {
                     BlockType type = GetBlockType();
                     Parent.Block.CreateBlock(type, true);
+                    yield return null;
 
                     List<MoveInfo> moveInfos = new List<MoveInfo>();
                     Cell targetCell = Parent.GetArroundCell((int)Parent.Direction);
@@ -127,30 +129,39 @@ namespace JH
                         }
                     }
 
-                    int totalMoveNum = moveInfos.Count;
+                    _totalMoveNum = moveInfos.Count;
 
                     for (int j = moveInfos.Count - 1; j >= 0; --j)
                     {
                         moveInfos[j].Block.RemovePivotCell();
                         moveInfos[j].TargetCell.Block.AddBlock(moveInfos[j].Block, false);
-                        moveInfos[j].TargetCell.Block.MiddleBlock.Move.SetMoveEndAction(() => --totalMoveNum);
+                        moveInfos[j].TargetCell.Block.MiddleBlock.Move.SetMoveEndAction(() => ReduceTotalMoveNum());
                         moveInfos[j].TargetCell.Block.MiddleBlock.Move.Move(BlockMove.MoveType.BlockFill);
                     }
 
-                    while(totalMoveNum != 0)
+                    while(_totalMoveNum != 0)
                     {
                         yield return null;
                     }
                 }
+                GameController.Instance.RemoveGameState(GameController.GameState.GenerateEffect);
+            }
+
+            private void ReduceTotalMoveNum()
+            {
+                --_totalMoveNum;
             }
 
             private int ComputeGenerateNum()
             {
                 int generateNum = 0;
                 Cell targetCell = Parent.GetArroundCell((int)Parent.Direction);
-                while(targetCell != null && targetCell.Block.IsEmpty)
+                while (targetCell != null && targetCell.Direction != CellDirectionType.None)
                 {
-                    ++generateNum;
+                    if (!targetCell.Block.HasMiddleBlock)
+                    {
+                        ++generateNum;
+                    }
                     targetCell = targetCell.GetArroundCell((int)targetCell.Direction);
                 }
                 return generateNum;

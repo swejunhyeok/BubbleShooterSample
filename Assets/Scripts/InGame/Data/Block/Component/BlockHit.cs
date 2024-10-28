@@ -45,7 +45,8 @@ namespace JH
                 }
                 if((Parent.Attribute.HitEffect & HitEffectType.Fairy) == HitEffectType.Fairy)
                 {
-                    
+                    Fairy fairy = ObjectPoolController.Instance.GetFairy();
+                    fairy.RunFairy(transform.position, GameController.Instance.TrBoss.position, () => { --GameController.Instance.BossNowHealth; });
                 }
                 if (isDestroy)
                 {
@@ -104,11 +105,27 @@ namespace JH
 
             public void FallBlock()
             {
+                ++GameController.Instance.RunningFallObject;
                 Parent.State.SetState(BlockStateType.Destroy);
-
-
-
                 Parent.RemovePivotCell();
+                StartCoroutine(FallMove());
+            }
+
+            private IEnumerator FallMove(float duration = 0.5f)
+            {
+                float timeDepth = InGameUtils.GetTimeDepth(duration);
+                float delta = 0;
+                Vector2 orgPosition = transform.position;
+                while (delta < 1)
+                {
+                    delta += Time.deltaTime * timeDepth;
+                    transform.position = Vector2.Lerp(orgPosition, GameController.Instance.TrHole.position, delta);
+                    if (delta < 1)
+                    {
+                        yield return null;
+                    }
+                }
+                --GameController.Instance.RunningFallObject;
                 Parent.Dispose();
             }
 

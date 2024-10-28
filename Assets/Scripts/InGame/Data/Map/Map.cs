@@ -142,18 +142,18 @@ namespace JH
                         if(cell.Block.HasMiddleBlock)
                         {
                             FallInfo fallInfo = new FallInfo();
-                            GetConnectedCell(cell, fallInfo, visitCell);
+                            fallInfo.ConnectedCell.Add(cell);
+                            fallInfo.IsArriveEnd |= (cell.Pos.y == _lines.Count - 1);
+                            GetConnectedCell(cell, ref fallInfo, ref visitCell);
                             fallInfos.Add(fallInfo);
                         }
                     }
                 }
 
-                bool isFall = false;
                 for(int i = 0; i < fallInfos.Count; ++i)
                 {
                     if (!fallInfos[i].IsArriveEnd)
                     {
-                        isFall = true;
                         for(int j = 0; j < fallInfos[i].ConnectedCell.Count; ++j)
                         {
                             fallInfos[i].ConnectedCell[j].Block.MiddleBlock.Hit.FallBlock();
@@ -162,17 +162,14 @@ namespace JH
                 }
 
                 GameController.Instance.RemoveGameState(GameController.GameState.Processing_UserInput);
-                if (isFall)
+                if(IsNeedGenerateBlock())
                 {
-                    if(IsNeedGenerateBlock())
-                    {
-                        GameController.Instance.AddGameState(GameController.GameState.GenerateEffect);
-                        RequsetGenerate();
-                    }
+                    GameController.Instance.AddGameState(GameController.GameState.GenerateEffect);
+                    RequsetGenerate();
                 }
             }
 
-            private void GetConnectedCell(Cell pivotCell, FallInfo fallInfo, List<Cell> visitCell)
+            private void GetConnectedCell(Cell pivotCell, ref FallInfo fallInfo, ref List<Cell> visitCell)
             {
                 for(int i = 0; i < pivotCell.ArroundCell.Count; ++i)
                 {
@@ -189,7 +186,7 @@ namespace JH
                     {
                         fallInfo.ConnectedCell.Add(pivotCell.ArroundCell[i]);
                         fallInfo.IsArriveEnd |= (pivotCell.ArroundCell[i].Pos.y == _lines.Count - 1);
-                        GetConnectedCell(pivotCell.ArroundCell[i], fallInfo, visitCell);
+                        GetConnectedCell(pivotCell.ArroundCell[i], ref fallInfo, ref visitCell);
                     }
                 }
             }

@@ -14,7 +14,7 @@ namespace JH
                 List<Cell> visitCell = new List<Cell>() { Parent.PivotCell};
                 List<Cell> sameColorCell = new List<Cell>() { Parent.PivotCell};
 
-                CheckArroundCell(Parent.PivotCell, visitCell, sameColorCell);
+                CheckArroundCell(Parent.PivotCell, ref visitCell, ref sameColorCell);
 
                 if(sameColorCell.Count >= 3)
                 {
@@ -30,7 +30,7 @@ namespace JH
                 }
             }
 
-            private void CheckArroundCell(Cell pivotCell, List<Cell> visitCell, List<Cell> sameColorCell)
+            private void CheckArroundCell(Cell pivotCell, ref List<Cell> visitCell, ref List<Cell> sameColorCell)
             {
                 for(int i = 0; i < pivotCell.ArroundCell.Count; ++i)
                 {
@@ -41,13 +41,13 @@ namespace JH
                     visitCell.Add(pivotCell.ArroundCell[i]);
                     if (pivotCell.ArroundCell[i] == null)
                     {
-                        return;
+                        continue;
                     }
 
                     if (IsSameColor(pivotCell.ArroundCell[i]))
                     {
                         sameColorCell.Add(pivotCell.ArroundCell[i]);
-                        CheckArroundCell(pivotCell.ArroundCell[i], visitCell, sameColorCell);
+                        CheckArroundCell(pivotCell.ArroundCell[i], ref visitCell, ref sameColorCell);
                     }
                 }
             }

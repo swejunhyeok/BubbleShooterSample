@@ -42,7 +42,7 @@ namespace JH
                 StartCoroutine(MoveMultiPositions(type, targetPositions));
             }
 
-            protected IEnumerator MoveLocalPositionZero(MoveType type, float duration = 0.5f)
+            protected IEnumerator MoveLocalPositionZero(MoveType type, float duration = 0.25f)
             {
                 float timeDepth = InGameUtils.GetTimeDepth(duration);
                 float deltaSum = 0f;

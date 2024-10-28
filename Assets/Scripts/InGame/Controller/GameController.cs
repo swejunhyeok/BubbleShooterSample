@@ -42,12 +42,17 @@ namespace JH
                 // allocate 4bit (0x0000000F)
                 // game initalize state
                 GameStart = 0x00000001,
-                GenerateEffect = 0x00000002,
 
                 // allocate 4 bit (0x000000F0)
                 // game play state
                 Processing_UserInput = 0x00000010,
                 Done_GameEnd = 0x00000020,
+
+                // allocate 8 bit (0x0000FF00)
+                // game effect state
+                GenerateEffect = 0x00000100,
+                FairyEffect = 0x00000200,
+                FallEffect = 0x00000400,
             }
 
             [SerializeField]
@@ -105,7 +110,7 @@ namespace JH
                 get => _bossNowHealth;
                 set
                 {
-                    _bossNowHealth = value;
+                    _bossNowHealth = Mathf.Max(0, value);
                     UIController.Instance.BossHealthSet((float)_bossNowHealth / _bossMaxHealth);
                 }
             }
@@ -125,6 +130,42 @@ namespace JH
 
             #endregion
 
+            #region Etc object
+
+            [Header("Etc object")]
+            [SerializeField]
+            private Transform _trHole;
+            public Transform TrHole => _trHole;
+
+            [SerializeField]
+            private Transform _trBoss;
+            public Transform TrBoss => _trBoss;
+
+            [SerializeField]
+            private int _runningFallObject;
+            public int RunningFallObject
+            {
+                get { return _runningFallObject; }
+                set
+                {
+                    if (_runningFallObject != value)
+                    {
+                        if (_runningFallObject == 0)
+                        {
+                            AddGameState(GameState.FallEffect);
+                        }
+                        _runningFallObject = value;
+
+                        if (_runningFallObject == 0)
+                        {
+                            RemoveGameState(GameState.FallEffect);
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
             #region Data load
 
             private void LoadLevelData(int level)
@@ -135,6 +176,9 @@ namespace JH
                     return;
                 }
                 JsonData root = JsonMapper.ToObject(levelFile.text);
+
+                // Level type load
+                _type = (LevelType)InGameUtils.ParseInt(ref root, ConstantData.LEVEL_DATA_LEVEL_TYPE);
 
                 // Move load
                 Move = InGameUtils.ParseInt(ref root, ConstantData.LEVEL_DATA_MOVE);
@@ -205,17 +249,10 @@ namespace JH
 
             public System.Action IdleAction = null;
 
-            private void Update()
+            public void RunIdleAction()
             {
-                if(IsContainState(GameState.GenerateEffect))
-                {
-                    if(Map.CheckGenerateBlock())
-                    {
-                        RemoveGameState(GameState.GenerateEffect);
-                        IdleAction?.Invoke();
-                        IdleAction = null;
-                    }
-                }
+                IdleAction?.Invoke();
+                IdleAction = null;
             }
 
             #endregion
@@ -234,10 +271,12 @@ namespace JH
 
             private void InputTouch(Vector2 touchPosition, TouchPhase type)
             {
-                if (IsContainState(GameState.Processing_UserInput) ||
-                    IsContainState(GameState.GenerateEffect) ||
-                    IsContainState(GameState.GameStart) ||
-                    IsContainState(GameState.Done_GameEnd))
+                if (State != GameState.Idle)
+                {
+                    TouchCancle();
+                    return;
+                }
+                if(_bossNowHealth == 0)
                 {
                     TouchCancle();
                     return;
