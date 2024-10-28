@@ -51,6 +51,7 @@ namespace JH
             ArroundMatch = 0x002,
             SpecialBlock = 0x004,
             GetShot = 0x008,
+            Arrive = 0x010,
         }
 
         [System.Flags]
@@ -134,6 +135,46 @@ namespace JH
             public BlockAttribute HitChangeBlock
             {
                 get { return _hitChangeBlock; }
+            }
+
+            #endregion
+
+            #region Score
+
+            [Header("Score")]
+            [SerializeField]
+            private int _hitScore;
+            public int HitScore
+            {
+                get { return _hitScore; }
+            }
+
+            [SerializeField]
+            private bool _isHitScoreMultiplyComb;
+            public bool IsHitScoreMultiplyComb
+            {
+                get { return _isHitScoreMultiplyComb; }
+            }
+
+            [SerializeField]
+            private int _fallScore;
+            public int FallScore
+            {
+                get { return _fallScore; }
+            }
+
+            [SerializeField]
+            private bool _isFallScoreMultiplyComb;
+            public bool IsFallScoreMultiplyComb
+            {
+                get { return _isFallScoreMultiplyComb; }
+            }
+
+            [SerializeField]
+            private int _retainScore;
+            public int RetainScore
+            {
+                get { return _retainScore; }
             }
 
             #endregion

@@ -42,11 +42,14 @@ namespace JH
                 // allocate 4bit (0x0000000F)
                 // game initalize state
                 GameStart = 0x00000001,
+                Loading = 0x00000002,
+                CameraMove = 0x00000004,
 
                 // allocate 4 bit (0x000000F0)
                 // game play state
                 Processing_UserInput = 0x00000010,
                 Done_GameEnd = 0x00000020,
+                Done_GameFail = 0x00000040,
 
                 // allocate 8 bit (0x0000FF00)
                 // game effect state
@@ -56,7 +59,7 @@ namespace JH
             }
 
             [SerializeField]
-            private GameState _state = GameState.GameStart;
+            private GameState _state = GameState.GameStart | GameState.Loading;
             public GameState State => _state;
 
             public void AddGameState(GameState state)
@@ -67,6 +70,19 @@ namespace JH
             public void RemoveGameState(GameState state)
             {
                 _state &= ~state;
+                if(_state == GameState.Idle)
+                {
+                    if (_type == LevelType.Boss && _bossNowHealth == 0)
+                    {
+                        AddGameState(GameState.Done_GameEnd);
+                        Map.GameDone();
+                    }
+                    else if(Move == 0)
+                    {
+                        AddGameState(GameState.Done_GameFail);
+                        UIController.Instance.SetFailPopup();
+                    }
+                }
             }
 
             public bool IsContainState(GameState state)
@@ -98,6 +114,29 @@ namespace JH
             [SerializeField]
             private int[] _starScores = new int[4];
             public int[] StarScores => _starScores;
+            public int StartNum
+            {
+                get
+                {
+                    int lastIndex = 0;
+                    for(int i = 0; i < _starScores.Length; ++i)
+                    {
+                        if (_starScores[i] > _score)
+                        {
+                            lastIndex = i;
+                        }
+                    }
+                    return lastIndex;
+                }
+            }
+
+            [SerializeField]
+            private int _score = 0;
+            public int Score
+            {
+                get => _score;
+                set => _score = value;
+            }
 
             [SerializeField]
             private int _bossMaxHealth = 0;
@@ -112,6 +151,28 @@ namespace JH
                 {
                     _bossNowHealth = Mathf.Max(0, value);
                     UIController.Instance.BossHealthSet((float)_bossNowHealth / _bossMaxHealth);
+                }
+            }
+
+            [SerializeField]
+            private int _comb = 0;
+            public int Comb
+            {
+                get => _comb;
+                set
+                {
+                    _comb = value;
+                }
+            }
+
+            [SerializeField]
+            private int _wallComb = 0;
+            public int WallComb
+            {
+                get => _wallComb;
+                set
+                {
+                    _wallComb = value;
                 }
             }
 
@@ -164,6 +225,28 @@ namespace JH
                 }
             }
 
+            [SerializeField]
+            private int _runningGenerateEffect = 0;
+            public int RunningGenerateEffect
+            {
+                get => _runningGenerateEffect;
+                set
+                {
+                    if (_runningGenerateEffect != value)
+                    {
+                        if(_runningGenerateEffect == 0)
+                        {
+                            AddGameState(GameState.GenerateEffect);
+                        }
+                        _runningGenerateEffect = value;
+                        if (_runningGenerateEffect == 0)
+                        {
+                            RemoveGameState(GameState.GenerateEffect);
+                        }
+                    }
+                }
+            }
+
             #endregion
 
             #region Data load
@@ -211,19 +294,6 @@ namespace JH
 
 
                 RemoveGameState(GameState.GameStart);
-                bool isNeed = Map.IsNeedGenerateBlock();
-                if (isNeed)
-                {
-                    AddGameState(GameState.GenerateEffect);
-                    StartCoroutine(CheckGenerateBlock());
-                }
-            }
-
-            private IEnumerator CheckGenerateBlock()
-            {
-                yield return new WaitForSeconds(1);
-
-                Map.RequsetGenerate();
             }
 
             #endregion
@@ -232,7 +302,6 @@ namespace JH
 
             private void Start()
             {
-                InputController.Instance.SetTouchAction(InputTouch);
                 StartCoroutine(GameStart());
             }
 
@@ -243,8 +312,17 @@ namespace JH
 
                 yield return null;
 
+                InputController.Instance.SetTouchAction(InputTouch);
                 UIController.Instance.Sponer.Init();
                 LoadLevelData(10);
+            }
+
+            public void FinishCameraMove()
+            {
+                if (Map.IsNeedGenerateBlock())
+                {
+                    Map.RequsetGenerate(true);
+                }
             }
 
             public System.Action IdleAction = null;
@@ -276,7 +354,7 @@ namespace JH
                     TouchCancle();
                     return;
                 }
-                if(_bossNowHealth == 0)
+                if(Move == 0)
                 {
                     TouchCancle();
                     return;
@@ -321,6 +399,10 @@ namespace JH
             public void OnTouchUp(Vector2 touchPosition)
             {
                 if(_previouseCell == null)
+                {
+                    return;
+                }
+                if(_hintLineInfo.Count == 0)
                 {
                     return;
                 }
@@ -374,6 +456,10 @@ namespace JH
                 for (int i = 0; i < detectedIndex.Count; ++i)
                 {
                     Cell cell = Map.GetCell(detectedIndex[i]);
+                    if(cell == null)
+                    {
+                        continue;
+                    }
                     if (cell.Type == CellType.None)
                     {
                         previouseEmptyCellList = new List<Cell>(emptyCellList);

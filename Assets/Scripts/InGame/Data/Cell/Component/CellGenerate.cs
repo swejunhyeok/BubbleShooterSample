@@ -19,11 +19,16 @@ namespace JH
             [SerializeField]
             private GenerateData[] _generateDatas = null;
 
+            private int _generateReduceNum = -1;
+
+            private int _generateNum = 0;
+
             private int _totalWeight = 0;
 
-            public void LoadGenerateData(LitJson.JsonData generatesRoot)
+            public void LoadGenerateData(LitJson.JsonData generatesRoot, int generateReduceNum)
             {
                 _generateDatas = new GenerateData[generatesRoot.Count];
+                _generateReduceNum = generateReduceNum;
 
                 for (int i = 0; i < generatesRoot.Count; ++i)
                 {
@@ -76,13 +81,14 @@ namespace JH
                 return _generateDatas[selectIndex].Type;
             }
 
-            public void GenerateObject()
+            public void GenerateObject(bool isFirst)
             {
-                if(Parent.Block.HasMiddleBlock)
+                ++GameController.Instance.RunningGenerateEffect;
+                if (Parent.Block.HasMiddleBlock)
                 {
                     return;
                 }
-                StartCoroutine(GenerateCoroutine());
+                StartCoroutine(GenerateCoroutine(isFirst));
             }
 
 
@@ -92,7 +98,7 @@ namespace JH
                 public Cell TargetCell;
             }
             private int _totalMoveNum = 0;
-            private IEnumerator GenerateCoroutine()
+            private IEnumerator GenerateCoroutine(bool isFirst)
             {
                 int generateNum = ComputeGenerateNum();
                 for(int i = 0; i < generateNum; ++i)
@@ -103,7 +109,7 @@ namespace JH
 
                     List<MoveInfo> moveInfos = new List<MoveInfo>();
                     Cell targetCell = Parent.GetArroundCell((int)Parent.Direction);
-                    if(targetCell != null && targetCell.Type != CellType.FinishCell)
+                    if(targetCell != null)
                     {
                         moveInfos.Add(new MoveInfo()
                         {
@@ -114,6 +120,11 @@ namespace JH
                     while (targetCell != null && targetCell.Block.HasMiddleBlock)
                     {
                         Block middleBlock = targetCell.Block.MiddleBlock;
+
+                        if (targetCell.Type == CellType.FinishCell)
+                        {
+                            break;
+                        }
                         targetCell = targetCell.GetArroundCell((int)targetCell.Direction);
                         if (targetCell != null)
                         {
@@ -144,7 +155,36 @@ namespace JH
                         yield return null;
                     }
                 }
-                GameController.Instance.RemoveGameState(GameController.GameState.GenerateEffect);
+                if(!isFirst)
+                {
+                    _generateNum += generateNum;
+                    while(_generateNum > _generateReduceNum)
+                    {
+                        _generateNum -= _generateReduceNum;
+                        ReduceFinishCell();
+                    }
+                }
+                --GameController.Instance.RunningGenerateEffect;
+            }
+
+            private void ReduceFinishCell()
+            {
+                List<Cell> connectedCell = new List<Cell>();
+                Cell targetCell = Parent.GetArroundCell((int)Parent.Direction);
+                while (targetCell != null)
+                {
+                    connectedCell.Add(targetCell);
+                    if (targetCell.Type == CellType.FinishCell)
+                    {
+                        break;
+                    }
+                    targetCell = targetCell.GetArroundCell((int)targetCell.Direction);
+                }
+                if(connectedCell.Count >= 2)
+                {
+                    connectedCell[connectedCell.Count - 1].ChangeType(CellType.NormalCell);
+                    connectedCell[connectedCell.Count - 2].ChangeType(CellType.FinishCell);
+                }
             }
 
             private void ReduceTotalMoveNum()
@@ -156,11 +196,15 @@ namespace JH
             {
                 int generateNum = 0;
                 Cell targetCell = Parent.GetArroundCell((int)Parent.Direction);
-                while (targetCell != null && targetCell.Direction != CellDirectionType.None)
+                while (targetCell != null)
                 {
                     if (!targetCell.Block.HasMiddleBlock)
                     {
                         ++generateNum;
+                    }
+                    if (targetCell.Type == CellType.FinishCell)
+                    {
+                        break;
                     }
                     targetCell = targetCell.GetArroundCell((int)targetCell.Direction);
                 }

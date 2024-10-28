@@ -15,6 +15,7 @@ namespace JH
             {
                 BlockFill,
                 BlockShoot,
+                JustMove,
             }
 
             private System.Action _moveEndAction;
@@ -115,6 +116,14 @@ namespace JH
                         }
                         yield return null;
                     }
+                    if(i != timeDepth.Count - 1)
+                    {
+                        ++GameController.Instance.WallComb;
+                        int score = ConstantData.WALL_SCORE * GameController.Instance.WallComb;
+                        GameController.Instance.Score += score;
+                        ScoreText scoreText = ObjectPoolController.Instance.GetScoreText();
+                        scoreText.SetScoreText(score.ToString(), targetPositions[i]);
+                    }
                     previousPosition = targetPositions[i];
                 }
 
@@ -141,6 +150,11 @@ namespace JH
                         OnBlockShootStart();
                         break;
                     }
+                    case MoveType.JustMove:
+                    {
+                        OnJustMoveStart();
+                        break;
+                    }
                 }
             }
 
@@ -151,6 +165,7 @@ namespace JH
 
             protected virtual void OnBlockFillStart() { }
             protected virtual void OnBlockShootStart() { }
+            protected virtual void OnJustMoveStart() { }
             
             #endregion
 
@@ -171,6 +186,11 @@ namespace JH
                         OnBlockShootEnd();
                         break;
                     }
+                    case MoveType.JustMove:
+                    {
+                        OnJustMoveEnd();
+                        break;
+                    }
                 }
             }
 
@@ -186,6 +206,7 @@ namespace JH
 
             protected virtual void OnBlockFillEnd() { }
             protected virtual void OnBlockShootEnd() { }
+            protected virtual void OnJustMoveEnd() { }
 
             #endregion
 

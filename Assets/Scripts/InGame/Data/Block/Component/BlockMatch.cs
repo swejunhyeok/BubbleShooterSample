@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
 namespace JH
@@ -18,6 +19,8 @@ namespace JH
 
                 if(sameColorCell.Count >= 3)
                 {
+                    ++GameController.Instance.Comb;
+                    UIController.Instance.AddNerosBeedsCount(sameColorCell.Count);
                     List<Vector2Int> hitPosition = new List<Vector2Int>();
                     for(int i = 0; i < sameColorCell.Count; ++i)
                     {
@@ -26,6 +29,34 @@ namespace JH
                     for(int i = 0; i < sameColorCell.Count; ++i)
                     {
                         sameColorCell[i].Block.Hit(LayerType.Middle, Parent.Attribute.Type, HitConditionType.ColorMatch, hitPosition);
+                    }
+                }
+                else
+                {
+                    bool isResetComb = true;
+                    for(int i = 0; i < Parent.PivotCell.ArroundCell.Count; ++i)
+                    {
+                        if (Parent.PivotCell.ArroundCell[i] == null)
+                        {
+                            continue;
+                        }
+                        if (Parent.PivotCell.ArroundCell[i].Block.HighestBlock == null)
+                        {
+                            continue;
+                        }
+                        if ((Parent.PivotCell.ArroundCell[i].Block.HighestBlock.Attribute.HitCondition & HitConditionType.GetShot) == HitConditionType.GetShot)
+                        {
+                            isResetComb = false;
+                            break;
+                        }
+                    }
+                    if (isResetComb)
+                    {
+                        GameController.Instance.Comb = 0;
+                    }
+                    else
+                    {
+                        ++GameController.Instance.Comb;
                     }
                 }
             }

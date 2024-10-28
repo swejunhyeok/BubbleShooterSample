@@ -43,6 +43,8 @@ namespace JH
             private GameObject _prefabBlock;
             [SerializeField]
             private GameObject _prefabFairy;
+            [SerializeField]
+            private GameObject _prefabScore;
 
             #endregion
 
@@ -134,6 +136,22 @@ namespace JH
                 _objectPoolFairy.Dispose(fairy);
             }
 
+            private ObjectPool<ScoreText> _objectPoolScoreText = new ObjectPool<ScoreText>();
+            public ScoreText GetScoreText(Transform parent = null)
+            {
+                ScoreText scoreText = _objectPoolScoreText.GetObject();
+                scoreText.gameObject.SetActive(true);
+                if (parent != null)
+                {
+                    scoreText.transform.parent = parent;
+                }
+                return scoreText;
+            }
+            public void Dispose(ScoreText scoreText)
+            {
+                _objectPoolScoreText.Dispose(scoreText);
+            }
+
             #endregion
 
             #region General
@@ -144,6 +162,7 @@ namespace JH
                 _objectPoolBlock.Init(_prefabBlock, transform);
                 _objectPoolLine.Init(_prefabLine, transform);
                 _objectPoolFairy.Init(_prefabFairy, transform);
+                _objectPoolScoreText.Init(_prefabScore, transform);
             }
 
             #endregion

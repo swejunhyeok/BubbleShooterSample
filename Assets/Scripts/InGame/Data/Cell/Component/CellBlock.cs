@@ -86,9 +86,10 @@ namespace JH
                 MiddleBlock.transform.position = UIController.Instance.PosMainSponer;
                 if (type == BlockType.BigBombCircle)
                 {
+                    ++GameController.Instance.Comb;
                     MiddleBlock.Move.SetMoveEndAction(() =>
                     {
-                        Parent.Effect.RunLargeBombEffect();
+                        MiddleBlock.Hit.Hit(HitConditionType.Arrive, BlockType.None);
                         GameController.Instance.Map.FallCheck();
                     });
                 }

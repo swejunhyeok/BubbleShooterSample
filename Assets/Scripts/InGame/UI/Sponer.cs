@@ -19,14 +19,11 @@ namespace JH
             private List<BlockType> _sponerInfo = new List<BlockType>();
 
             [SerializeField]
-            private int _sponerCount = 2;
-
-            [SerializeField]
             private List<BlockType> _defaultBlockType = new List<BlockType>();
 
             public void Init()
             {
-                for (int i = 0; i < _sponerCount; ++i)
+                for (int i = 0; i < 2; ++i)
                 {
                     BlockType selectType = _defaultBlockType[Random.Range(0, _defaultBlockType.Count)];
                     _sponerInfo.Add(selectType);
@@ -36,7 +33,6 @@ namespace JH
 
             public void AddBigBombCircle()
             {
-                _sponerCount = 3;
                 _sponerCircles[2].gameObject.SetActive(true);
                 _sponerInfo.Insert(0, BlockType.BigBombCircle);
                 SetCircleImage();
@@ -44,7 +40,6 @@ namespace JH
 
             public void UseBigBombCircle()
             {
-                _sponerCount = 2;
                 _sponerCircles[2].gameObject.SetActive(false);
 
                 UIController.Instance.SetNerosBeedsActive(true);
@@ -52,6 +47,10 @@ namespace JH
 
             public void AddDefaultCircle()
             {
+                if(GameController.Instance.Move == _sponerInfo.Count)
+                {
+                    return;
+                }
                 _sponerInfo.Add(_defaultBlockType[Random.Range(0, _defaultBlockType.Count)]);
                 SetCircleImage();
             }
@@ -61,6 +60,11 @@ namespace JH
                 for (int i = 0; i < _sponerInfo.Count; ++i)
                 {
                     _sponerCircles[i].SetCircle(_sponerInfo[i]);
+                    _sponerCircles[i].gameObject.SetActive(true);
+                }
+                for(int i = _sponerInfo.Count; i < _sponerCircles.Length; ++i)
+                {
+                    _sponerCircles[i].gameObject.SetActive(false);
                 }
             }
 

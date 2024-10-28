@@ -50,6 +50,8 @@ namespace JH
             public Cell LeftCell => _arroundCell[(int)CellDirectionType.Left];
             public Cell LeftUpCell => _arroundCell[(int)CellDirectionType.LeftUp];
 
+            public void ChangeType(CellType type) => _type = type;
+
             public void SetArroundCell(List<Cell> arroundCell) => _arroundCell = new List<Cell>(arroundCell);
             public Cell GetArroundCell(int index)
             {
@@ -100,7 +102,7 @@ namespace JH
                 {
                     if(cellRoot.ContainsKey(ConstantData.LEVEL_DATA_GENERATE_INFO_LIST))
                     {
-                        Generate.LoadGenerateData(cellRoot[ConstantData.LEVEL_DATA_GENERATE_INFO_LIST]);
+                        Generate.LoadGenerateData(cellRoot[ConstantData.LEVEL_DATA_GENERATE_INFO_LIST], InGameUtils.ParseInt(ref cellRoot, ConstantData.LEVEL_DATA_GENERATE_REDUCE_NUM, -1));
                     }
                 }
             }

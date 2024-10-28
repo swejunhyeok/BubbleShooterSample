@@ -7,6 +7,15 @@ namespace JH
     public static class ConstantData
     {
 
+        #region Scene
+
+        public static string LOGO_SCENE = "LogoScene";
+        public static string TITLE_SCENE = "TitleScene";
+        public static string PLAY_SCENE = "PlayScene";
+
+        #endregion
+
+
         #region In Game
 
         private static float heightInterval = -1f;
@@ -39,7 +48,12 @@ namespace JH
 
         public static float HINT_LINE_LIMIT = 10f;
 
-        public static int NEROS_BEEDS_NUM = 4;
+        public static int NEROS_BEEDS_NUM = 28;
+
+        public static int BIG_BOMB_DESTROY_SCORE = 250;
+        public static int WALL_SCORE = 25;
+
+        public static int RETAIN_MOVE_SCORE = 1000;
 
         #endregion
 
@@ -63,6 +77,7 @@ namespace JH
         public static string LEVEL_DATA_GENERATE_INFO_LIST = "gil";
         public static string LEVEL_DATA_GENERATE_NUM = "gn";
         public static string LEVEL_DATA_GENERATE_WEIGHT = "gw";
+        public static string LEVEL_DATA_GENERATE_REDUCE_NUM = "grn";
 
         public static string LEVEL_DATA_BLOCK_TYPE_LIST = "btl";
         public static string LEVEL_DATA_BLOCK_TYPE = "bt";

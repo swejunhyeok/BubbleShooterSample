@@ -37,14 +37,19 @@ namespace JH
                     {
                         continue;
                     }
-                    Parent.ArroundCell[i].Block.Hit(hitLayer, BlockType.BombCircle, HitConditionType.SpecialBlock);
+                    Parent.ArroundCell[i].Block.Hit(hitLayer, BlockType.BigBombCircle, HitConditionType.SpecialBlock);
                     for (int j = 0; j < Parent.ArroundCell[i].ArroundCell.Count; ++j)
                     {
                         if (visitCell.IndexOf(Parent.ArroundCell[i].ArroundCell[j]) != -1)
                         {
                             continue;
                         }
-                        Parent.ArroundCell[i].ArroundCell[j].Block.Hit(hitLayer, BlockType.BombCircle, HitConditionType.SpecialBlock);
+                        visitCell.Add(Parent.ArroundCell[i].ArroundCell[j]);
+                        if (Parent.ArroundCell[i].ArroundCell[j] == null)
+                        {
+                            continue;
+                        }
+                        Parent.ArroundCell[i].ArroundCell[j].Block.Hit(hitLayer, BlockType.BigBombCircle, HitConditionType.SpecialBlock);
                     }
                 }
             }

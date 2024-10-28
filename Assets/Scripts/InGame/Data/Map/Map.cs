@@ -62,8 +62,6 @@ namespace JH
             [Header("Cell check")]
             [SerializeField]
             private List<Cell> _generateCell = new List<Cell>();
-            [SerializeField]
-            private List<Cell> _finishCell = new List<Cell>();
 
             public bool IsNeedGenerateBlock()
             {
@@ -75,6 +73,10 @@ namespace JH
                         if(targetCell.Block.IsEmpty)
                         {
                             return true;
+                        }
+                        if (targetCell.Type == CellType.FinishCell)
+                        {
+                            break;
                         }
                         targetCell = targetCell.GetArroundCell((int)targetCell.Direction);
                     }
@@ -97,17 +99,21 @@ namespace JH
                         {
                             return false;
                         }
+                        if(targetCell.Type == CellType.FinishCell)
+                        {
+                            break;
+                        }
                         targetCell = targetCell.GetArroundCell((int)targetCell.Direction);
                     }
                 }
                 return true;
             }
 
-            public void RequsetGenerate()
+            public void RequsetGenerate(bool isFirst)
             {
                 for(int i = 0; i < _generateCell.Count; ++i)
                 {
-                    _generateCell[i].Generate.GenerateObject();
+                    _generateCell[i].Generate.GenerateObject(isFirst);
                 }
             }
 
@@ -164,8 +170,7 @@ namespace JH
                 GameController.Instance.RemoveGameState(GameController.GameState.Processing_UserInput);
                 if(IsNeedGenerateBlock())
                 {
-                    GameController.Instance.AddGameState(GameController.GameState.GenerateEffect);
-                    RequsetGenerate();
+                    RequsetGenerate(false);
                 }
             }
 
@@ -189,6 +194,64 @@ namespace JH
                         GetConnectedCell(pivotCell.ArroundCell[i], ref fallInfo, ref visitCell);
                     }
                 }
+            }
+
+            #endregion
+
+            #region Game done
+
+            public void GameDone()
+            {
+                for(int y = 0; y < _lines.Count; ++y)
+                {
+                    for(int x = 0; x < ConstantData.MAX_WIDTH_NUM; ++x)
+                    {
+                        Cell cell = GetCell(x, y);
+                        if (cell == null)
+                        {
+                            continue;
+                        }
+
+                        if(cell.Block.HasMiddleBlock)
+                        {
+                            cell.Block.MiddleBlock.Hit.RetainBlockDestroy();
+                        }
+                    }
+                }
+
+                StartCoroutine(RetainMoveCoroutine());
+            }
+
+            private bool _isRunningRetainMoveEffect = false;
+            private IEnumerator RetainMoveCoroutine()
+            {
+                int retainMove = GameController.Instance.Move;
+                for(int i = 0; i < retainMove; ++i)
+                {
+                    _isRunningRetainMoveEffect = true;
+                    Block block = ObjectPoolController.Instance.GetBlock();
+                    block.transform.position = UIController.Instance.PosMainSponer;
+                    block.SetAttribute(UIController.Instance.Sponer.PopCircle());
+                    block.Hit.RetainMoveDestroy(ConstantData.RETAIN_MOVE_SCORE * (i + 1), () => { RetainMoveEffectEnd(); });
+                    --GameController.Instance.Move;
+                    if (i < retainMove - 2)
+                    {
+                        UIController.Instance.Sponer.AddDefaultCircle();
+                    }
+                    while(_isRunningRetainMoveEffect)
+                    {
+                        yield return null;
+                    }
+                }
+
+                yield return new WaitForSeconds(1);
+
+                UIController.Instance.SetClearPopup(GameController.Instance.Score.ToString(), GameController.Instance.StartNum);
+            }
+
+            private void RetainMoveEffectEnd()
+            {
+                _isRunningRetainMoveEffect = false;
             }
 
             #endregion
@@ -222,10 +285,6 @@ namespace JH
                         if(cell.Type == CellType.GenerateCell)
                         {
                             _generateCell.Add(cell);
-                        }
-                        if(cell.Type == CellType.FinishCell)
-                        {
-                            _finishCell.Add(cell);
                         }
 
                         List<Cell> arroundCell = new List<Cell>();

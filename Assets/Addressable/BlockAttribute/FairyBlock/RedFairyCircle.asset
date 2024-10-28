@@ -19,3 +19,9 @@ MonoBehaviour:
   _sprBlock: {fileID: 21300000, guid: f28c527bf1d4cba4b901464cd0b67f9b, type: 3}
   _hitCondition: 5
   _hitEffect: 17
+  _hitChangeBlock: {fileID: 0}
+  _hitScore: 10
+  _isHitScoreMultiplyComb: 1
+  _fallScore: 50
+  _isFallScoreMultiplyComb: 0
+  _retainScore: 50

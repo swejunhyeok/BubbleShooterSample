@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 namespace JH
 {
@@ -50,6 +51,22 @@ namespace JH
                 }
                 if (isDestroy)
                 {
+                    ScoreText scoreText = ObjectPoolController.Instance.GetScoreText();
+                    int score = 0;
+                    if(hitCondition != HitConditionType.SpecialBlock && hitBlock != BlockType.BigBombCircle)
+                    {
+                        score = ConstantData.BIG_BOMB_DESTROY_SCORE;
+                    }
+                    else
+                    {
+                        score = Parent.Attribute.HitScore;
+                        if(Parent.Attribute.IsHitScoreMultiplyComb)
+                        {
+                            score *= GameController.Instance.Comb;
+                        }
+                    }
+                    GameController.Instance.Score += score;
+                    scoreText.SetScoreText(score.ToString(), transform.position);
                     Destroy();
                 }
                 if (changeAttribute != null)
@@ -108,27 +125,49 @@ namespace JH
                 ++GameController.Instance.RunningFallObject;
                 Parent.State.SetState(BlockStateType.Destroy);
                 Parent.RemovePivotCell();
-                StartCoroutine(FallMove());
+                Parent.Move.SetMoveEndAction(() =>
+                {
+                    MoveEndFunc(Parent.Attribute.FallScore, Parent.Attribute.IsFallScoreMultiplyComb);
+                });
+                Parent.Move.Move(BlockMove.MoveType.JustMove, GameController.Instance.TrHole.position);
             }
 
-            private IEnumerator FallMove(float duration = 0.5f)
+            private void MoveEndFunc(int score, bool isMultiPly)
             {
-                float timeDepth = InGameUtils.GetTimeDepth(duration);
-                float delta = 0;
-                Vector2 orgPosition = transform.position;
-                while (delta < 1)
-                {
-                    delta += Time.deltaTime * timeDepth;
-                    transform.position = Vector2.Lerp(orgPosition, GameController.Instance.TrHole.position, delta);
-                    if (delta < 1)
-                    {
-                        yield return null;
-                    }
-                }
                 --GameController.Instance.RunningFallObject;
+                ScoreText scoreText = ObjectPoolController.Instance.GetScoreText();
+                if (isMultiPly)
+                {
+                    score *= GameController.Instance.Comb;
+                }
+                GameController.Instance.Score += score;
+                scoreText.SetScoreText(score.ToString(), transform.position);
                 Parent.Dispose();
             }
 
+            public void RetainMoveDestroy(int score, System.Action arriveAction)
+            {
+                Parent.State.SetState(BlockStateType.Destroy);
+                Parent.RemovePivotCell();
+
+                Parent.Move.SetMoveEndAction(() =>
+                {
+                    MoveEndFunc(score, false);
+                    arriveAction();
+                });
+                Parent.Move.Move(BlockMove.MoveType.JustMove, Vector3.zero);
+            }
+
+            public void RetainBlockDestroy()
+            {
+                ScoreText scoreText = ObjectPoolController.Instance.GetScoreText();
+                int score = Parent.Attribute.RetainScore;
+                GameController.Instance.Score += score;
+                scoreText.SetScoreText(score.ToString(), transform.position);
+
+                Parent.RemovePivotCell();
+                Parent.Dispose();
+            }
 
             #endregion
         }

@@ -91,7 +91,10 @@ namespace JH
 
             public void RemovePivotCell()
             {
-                PivotCell.Block.PopBlock(this);
+                if (PivotCell != null)
+                {
+                    PivotCell.Block.PopBlock(this);
+                }
                 _pivotCell = null;
             }
 

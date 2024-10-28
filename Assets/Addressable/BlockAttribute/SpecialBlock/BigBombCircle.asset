@@ -17,5 +17,11 @@ MonoBehaviour:
   _layer: 256
   _color: 0
   _sprBlock: {fileID: 21300000, guid: c893dc733cbe8c942b72987446d621a5, type: 3}
-  _hitCondition: 0
+  _hitCondition: 16
   _hitEffect: 9
+  _hitChangeBlock: {fileID: 0}
+  _hitScore: 0
+  _isHitScoreMultiplyComb: 0
+  _fallScore: 0
+  _isFallScoreMultiplyComb: 0
+  _retainScore: 0
